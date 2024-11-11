@@ -74,6 +74,11 @@ def preprocessing(base):
     base["movie_id"] = range(1, len(base) + 1)
     base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9]]
 
+    actors.columns = ["actor_id","actor_name"]
+    director.columns = ["director_id","director_name"]
+    genres.columns = ["genre_id","genre_label"]
+    writer.columns = ["writer_id","writer_name"]
+
     MovieActor = match_ids(base, MovieActor, actors, actors.columns[0], actors.columns[1])
     MovieDirector = match_ids(base, MovieDirector, director, director.columns[0], director.columns[1])
     MovieGenre = match_ids(base, MovieGenre, genres, genres.columns[0], genres.columns[1])
@@ -125,33 +130,114 @@ database = 'IMDB_MovieDB'
 # NOTES: MUST INCREASE MAX_PACKET_SIZE to 50M in bin config
 engine = create_engine(f"mysql+mysqlconnector://{username}:{password}@{host}/{database}")
 
-# import dfs into SQL tables
-Movie.to_sql('movie', con=engine, if_exists='replace', index=False)
-Actor.to_sql('actor', con=engine, if_exists='replace', index=False)
-Director.to_sql('director', con=engine, if_exists='replace', index=False)
-Genre.to_sql('genre', con=engine, if_exists='replace', index=False)
-Writer.to_sql('writer', con=engine, if_exists='replace', index=False)
+# create tables and set PKs, SKs
+with engine.connect() as sql_con:
+    # Independent tables
+    sql_con.execute(text("""
+                        CREATE TABLE `movie` (
+                        `movie_id` int(20) NOT NULL,
+                        `title` varchar(50) DEFAULT NULL,
+                        `status` varchar(50) DEFAULT NULL,
+                        `release_date` date DEFAULT NULL,
+                        `runtime` int(20) DEFAULT NULL,
+                        `adult` bool DEFAULT NULL,
+                        `original_language` varchar(20) DEFAULT NULL,
+                        `overview` text DEFAULT NULL,
+                        `popularity` double DEFAULT NULL,
+                        `release_year` year DEFAULT NULL,
+                        PRIMARY KEY (`movie_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin"""))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `actor` (
+                        `actor_id` int(10) NOT NULL,
+                        `actor_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`actor_id`)
+                        ) 
+                        ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `director` (
+                        `director_id` int(10) NOT NULL,
+                        `director_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`director_id`)
+                        ) 
+                        ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `genre` (
+                        `genre_id` int(20) NOT NULL,
+                        `genre_label` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`genre_id`)
+                        ) 
+                        ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `writer` (
+                        `writer_id` int(20) NOT NULL,
+                        `writer_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`writer_id`)
+                        ) 
+                        ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
 
-MovieActor.to_sql('movieactor', con=engine, if_exists='replace', index=False)
-MovieDirector.to_sql('moviedirector', con=engine, if_exists='replace', index=False)
-MovieGenre.to_sql('moviegenre', con=engine, if_exists='replace', index=False)
-MovieWriter.to_sql('moviewriter', con=engine, if_exists='replace', index=False)
+    # Dependent tables
+    sql_con.execute(text("""
+                        CREATE TABLE `movieactor` (
+                        `movie_id` int(20) NOT NULL,
+                        `actor_id` int(20) NOT NULL,
+                        `title` varchar(50) DEFAULT NULL,
+                        `actor_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`movie_id`, `actor_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `moviedirector` (
+                        `movie_id` int(20) NOT NULL,
+                        `director_id` int(20) NOT NULL,
+                        `title` varchar(50) DEFAULT NULL,
+                        `director_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`movie_id`, `director_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `moviegenre` (
+                        `movie_id` int(20) NOT NULL,
+                        `genre_id` int(20) NOT NULL,
+                        `title` varchar(50) DEFAULT NULL,
+                        `genre_label` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`movie_id`, `genre_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    sql_con.execute(text("""
+                        CREATE TABLE `moviewriter` (
+                        `movie_id` int(20) NOT NULL,
+                        `writer_id` int(20) NOT NULL,
+                        `title` varchar(50) DEFAULT NULL,
+                        `writer_name` varchar(50) DEFAULT NULL,
+                        PRIMARY KEY (`movie_id`, `writer_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+# import dfs into SQL tables
+Movie.to_sql('movie', con=engine, if_exists='append', index=False)
+Actor.to_sql('actor', con=engine, if_exists='append', index=False)
+Director.to_sql('director', con=engine, if_exists='append', index=False)
+Genre.to_sql('genre', con=engine, if_exists='append', index=False)
+Writer.to_sql('writer', con=engine, if_exists='append', index=False)
+
+MovieActor.to_sql('movieactor', con=engine, if_exists='append', index=False)
+MovieDirector.to_sql('moviedirector', con=engine, if_exists='append', index=False)
+MovieGenre.to_sql('moviegenre', con=engine, if_exists='append', index=False)
+MovieWriter.to_sql('moviewriter', con=engine, if_exists='append', index=False)
 print(f"Database {database} has been initialized.")
 
-# set primary and composite keys for each table
-with engine.connect() as sql_con:
-    # Add primary keys with text() for raw SQL commands
-    sql_con.execute(text("ALTER TABLE Movie ADD PRIMARY KEY (movie_id);"))
-    sql_con.execute(text("ALTER TABLE Actor ADD PRIMARY KEY (actor_id);"))
-    sql_con.execute(text("ALTER TABLE Director ADD PRIMARY KEY (director_id);"))
-    sql_con.execute(text("ALTER TABLE Genre ADD PRIMARY KEY (genre_id);"))
-    sql_con.execute(text("ALTER TABLE Writer ADD PRIMARY KEY (writer_id);"))
-
-    # Add composite keys
-    sql_con.execute(text("ALTER TABLE MovieActor ADD PRIMARY KEY (movie_id, actor_id);"))
-    sql_con.execute(text("ALTER TABLE MovieDirector ADD PRIMARY KEY (movie_id, director_id);"))
-    sql_con.execute(text("ALTER TABLE MovieGenre ADD PRIMARY KEY (movie_id, genre_id);"))
-    sql_con.execute(text("ALTER TABLE MovieWriter ADD PRIMARY KEY (movie_id, writer_id);"))
 print("Primary and composite keys added successfully.")
 
 
