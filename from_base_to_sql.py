@@ -191,7 +191,9 @@ with engine.connect() as sql_con:
                         `actor_id` int(20) NOT NULL,
                         `title` varchar(50) DEFAULT NULL,
                         `actor_name` varchar(50) DEFAULT NULL,
-                        PRIMARY KEY (`movie_id`, `actor_id`)
+                        PRIMARY KEY (`movie_id`, `actor_id`),
+                        FOREIGN KEY (`movie_id`) REFERENCES movie(`movie_id`),
+                        FOREIGN KEY (`actor_id`) REFERENCES actor(`actor_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
@@ -201,7 +203,9 @@ with engine.connect() as sql_con:
                         `director_id` int(20) NOT NULL,
                         `title` varchar(50) DEFAULT NULL,
                         `director_name` varchar(50) DEFAULT NULL,
-                        PRIMARY KEY (`movie_id`, `director_id`)
+                        PRIMARY KEY (`movie_id`, `director_id`),
+                        FOREIGN KEY (`movie_id`) REFERENCES movie(`movie_id`),
+                        FOREIGN KEY (`director_id`) REFERENCES director(`director_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
@@ -211,7 +215,9 @@ with engine.connect() as sql_con:
                         `genre_id` int(20) NOT NULL,
                         `title` varchar(50) DEFAULT NULL,
                         `genre_label` varchar(50) DEFAULT NULL,
-                        PRIMARY KEY (`movie_id`, `genre_id`)
+                        PRIMARY KEY (`movie_id`, `genre_id`),
+                        FOREIGN KEY (`movie_id`) REFERENCES movie(`movie_id`),
+                        FOREIGN KEY (`genre_id`) REFERENCES genre(`genre_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
@@ -221,7 +227,9 @@ with engine.connect() as sql_con:
                         `writer_id` int(20) NOT NULL,
                         `title` varchar(50) DEFAULT NULL,
                         `writer_name` varchar(50) DEFAULT NULL,
-                        PRIMARY KEY (`movie_id`, `writer_id`)
+                        PRIMARY KEY (`movie_id`, `writer_id`),
+                        FOREIGN KEY (`movie_id`) REFERENCES movie(`movie_id`),
+                        FOREIGN KEY (`writer_id`) REFERENCES writer(`writer_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
