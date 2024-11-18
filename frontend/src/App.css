@@ -1,0 +1,26 @@
+.status-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.status-card {
+  padding: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  min-width: 200px;
+}
+
+.status {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.success {
+  color: #4caf50;
+}
+
+.error {
+  color: #f44336;
+}

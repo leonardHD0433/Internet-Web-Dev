@@ -1,3 +1,4 @@
 .env
 /database/data/*
 !/database/data/.gitkeep
+__pycache__/
