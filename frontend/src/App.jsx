@@ -1,61 +1,44 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import StatusButton from './components/StatusButton'
+import ConnectionTest from './pages/ConnectionTest'
 import './App.css'
 
 function App() {
-  const [apiStatus, setApiStatus] = useState('checking...')
-  const [dbStatus, setDbStatus] = useState('checking...')
-  const [isLoading, setIsLoading] = useState(true)
+  const [showTest, setShowTest] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState('checking')
 
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        setIsLoading(true)
+  const handleStatusClick = () => {
+    setShowTest(!showTest)
+  }
 
-        // Check API connection
-        const apiResponse = await fetch('http://localhost:8000/api/health')
-        const apiData = await apiResponse.json()
-        setApiStatus(apiData.status)
+  const handleClose = () => {
+    setShowTest(false)
+  }
 
-        // Check DB connection
-        const dbResponse = await fetch('http://localhost:8000/api/db-check')
-        const dbData = await dbResponse.json()
-        setDbStatus(dbData.status)
-      } catch (error) {
-        console.error('Connection error:', error)
-        setApiStatus('failed')
-        setDbStatus('failed')
-      } finally {
-        setIsLoading(false)
-      }
+  const handleStatusUpdate = (apiStatus, dbStatus) => {
+    if (apiStatus === 'healthy' && dbStatus === 'connected') {
+      setConnectionStatus('healthy')
+    } else if (apiStatus === 'failed' || dbStatus === 'disconnected') {
+      setConnectionStatus('failed')
+    } else {
+      setConnectionStatus('checking')
     }
-
-    //Initial check
-    checkConnection()
-
-    // Set up periodic checks
-    const interval = setInterval(checkConnection, 30000)
-
-    // Cleanup on unmount
-    return () => clearInterval(interval)
-  }, [])
+  }
 
   return (
     <div className="app">
-      <h1>Connection Test</h1>
-      <div className="status-container">
-        <div className="status-card">
-          <h2>API Status</h2>
-          <p className={`status ${apiStatus === 'healthy' ? 'success' : 'error'}`}>
-            {apiStatus}
-          </p>
+      <StatusButton 
+        status={connectionStatus} 
+        onClick={handleStatusClick}
+      />
+      {showTest && (
+        <div className="test-overlay">
+          <ConnectionTest 
+            onStatusUpdate={handleStatusUpdate} 
+            onClose={handleClose}
+          />
         </div>
-        <div className="status-card">
-          <h2>Database Status</h2>
-          <p className={`status ${dbStatus === 'connected' ? 'success' : 'error'}`}>
-            {dbStatus}
-          </p>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

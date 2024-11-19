@@ -2,3 +2,4 @@
 !/database/data/.gitkeep
 __pycache__/
 .env
+.env.production
