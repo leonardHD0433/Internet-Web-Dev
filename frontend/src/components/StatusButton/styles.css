@@ -1,0 +1,32 @@
+.status-button {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #333333; /* Dark gray background */
+    color: #ffffff; /* White text */
+    cursor: pointer;
+}
+
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-indicator.checking {
+    background-color: #ffd700;
+}
+
+.status-indicator.healthy {
+    background-color: #4caf50;
+}
+
+.status-indicator.failed {
+    background-color: #f44336;
+}
