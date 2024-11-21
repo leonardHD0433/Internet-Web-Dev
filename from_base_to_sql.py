@@ -33,10 +33,13 @@ def remove_non_ascii(text):
         return text
 
 def preprocessing(base):
+    # Converting dates in dataset to standard date format, highly important to ensure dates are properly imported into SQL
+    base.release_date = pd.to_datetime(base.release_date)
+
     # Dropping all columns with significant (>50%) amount of null values (with the exception of IMDB rating)
     base.drop(columns=["imdb_id","tagline","production_companies","production_countries","spoken_languages","AverageRating","Poster_Link","Certificate","Meta_score","Star1","Star2","Star3","Star4","Director_of_Photography","Producers","Music_Composer"], inplace=True)
 
-    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating valeus with 0
+    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating values with 0
     base.fillna("Missing",inplace=True) # Filling all remaining null values with "Missing"
 
     base.drop_duplicates(inplace=True) # dropping duplicates while considering all columns
@@ -133,6 +136,7 @@ engine = create_engine(f"mysql+mysqlconnector://{username}:{password}@{host}/{da
 # create tables and set PKs, SKs
 with engine.connect() as sql_con:
     # Independent tables
+    print("Creating movie table...")
     sql_con.execute(text("""
                         CREATE TABLE `movie` (
                         `movie_id` int(20) NOT NULL,
@@ -148,6 +152,7 @@ with engine.connect() as sql_con:
                         PRIMARY KEY (`movie_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin"""))
     
+    print("Creating actor table...")
     sql_con.execute(text("""
                         CREATE TABLE `actor` (
                         `actor_id` int(10) NOT NULL,
@@ -157,6 +162,7 @@ with engine.connect() as sql_con:
                         ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating director table...")
     sql_con.execute(text("""
                         CREATE TABLE `director` (
                         `director_id` int(10) NOT NULL,
@@ -166,6 +172,7 @@ with engine.connect() as sql_con:
                         ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating genre table...")
     sql_con.execute(text("""
                         CREATE TABLE `genre` (
                         `genre_id` int(20) NOT NULL,
@@ -175,6 +182,7 @@ with engine.connect() as sql_con:
                         ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating writer table...")
     sql_con.execute(text("""
                         CREATE TABLE `writer` (
                         `writer_id` int(20) NOT NULL,
@@ -185,6 +193,7 @@ with engine.connect() as sql_con:
                         """))
 
     # Dependent tables
+    print("Creating movieactor table...")
     sql_con.execute(text("""
                         CREATE TABLE `movieactor` (
                         `movie_id` int(20) NOT NULL,
@@ -197,6 +206,7 @@ with engine.connect() as sql_con:
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating moviedirector table...")
     sql_con.execute(text("""
                         CREATE TABLE `moviedirector` (
                         `movie_id` int(20) NOT NULL,
@@ -209,6 +219,7 @@ with engine.connect() as sql_con:
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating moviegenre table...")
     sql_con.execute(text("""
                         CREATE TABLE `moviegenre` (
                         `movie_id` int(20) NOT NULL,
@@ -221,6 +232,7 @@ with engine.connect() as sql_con:
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    print("Creating moviewriter table...")
     sql_con.execute(text("""
                         CREATE TABLE `moviewriter` (
                         `movie_id` int(20) NOT NULL,
@@ -234,19 +246,26 @@ with engine.connect() as sql_con:
                         """))
     
 # import dfs into SQL tables
+print("Importing into movie...")
 Movie.to_sql('movie', con=engine, if_exists='append', index=False)
+print("Importing into actor...")
 Actor.to_sql('actor', con=engine, if_exists='append', index=False)
+print("Importing into director...")
 Director.to_sql('director', con=engine, if_exists='append', index=False)
+print("Importing into genre...")
 Genre.to_sql('genre', con=engine, if_exists='append', index=False)
+print("Importing into writer...")
 Writer.to_sql('writer', con=engine, if_exists='append', index=False)
 
+print("Importing into movieactor...")
 MovieActor.to_sql('movieactor', con=engine, if_exists='append', index=False)
+print("Importing into moviedirector...")
 MovieDirector.to_sql('moviedirector', con=engine, if_exists='append', index=False)
+print("Importing into moviegenre...")
 MovieGenre.to_sql('moviegenre', con=engine, if_exists='append', index=False)
+print("Importing into moviewriter...")
 MovieWriter.to_sql('moviewriter', con=engine, if_exists='append', index=False)
-print(f"Database {database} has been initialized.")
-
-print("Primary and composite keys added successfully.")
+print(f"Database {database} has been initialized!")
 
 
 
