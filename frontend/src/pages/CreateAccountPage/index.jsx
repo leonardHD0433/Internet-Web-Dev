@@ -38,7 +38,7 @@ const CreateAccountPage = ({ onRegister }) => {
     }
 
     // Call the onRegister prop from App.jsx
-    onRegister(e);
+    onRegister(formData);
   };
 
   return (

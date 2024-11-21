@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, Date, Text, Double, ForeignKey, create_engine, MetaData, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+import os
 
 # Database connection URL for MySQL
-DATABASE_URL = "mysql+pymysql://root@localhost:3306/imdb_moviedb"
+DATABASE_URL = f"mysql+pymysql://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
