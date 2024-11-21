@@ -1,9 +1,14 @@
 import './styles.css'
+import logo from '../../assets/CinerateLogo.png'
 
 const Logo = () => (
   <div className="logo-placeholder">
     <div className="logo-frame">
-      Logo Placeholder
+      <img 
+        src={logo}
+        alt="CINERATE Logo"
+        className="logo-image" 
+      />
     </div>
   </div>
 )

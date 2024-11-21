@@ -1,5 +1,6 @@
 .connection-test {
-  background: white;
+  background: rgb(79, 70, 70);
+  color: white;
   padding: 2rem;
   border-radius: 8px;
   max-width: 800px;

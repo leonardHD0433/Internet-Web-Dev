@@ -2,13 +2,9 @@ from sqlalchemy import Column, Integer, String, Date, Text, Double, ForeignKey, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
 
 # Database connection URL for MySQL
-DATABASE_URL = f"mysql+pymysql://{os.getenv('USER')}:{os.getenv('PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE')}"
+DATABASE_URL = f"mysql+pymysql://{os.getenv('DATABASE_USER')}:{os.getenv('DATABASE_PASSWORD')}@{os.getenv('DATABASE_HOST')}:{os.getenv('DATABASE_PORT')}/{os.getenv('DATABASE_NAME')}"
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)

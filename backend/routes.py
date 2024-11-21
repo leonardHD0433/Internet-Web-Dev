@@ -1,64 +1,29 @@
-from fastapi import FastAPI, HTTPException, Depends
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
-from .models import SessionLocal, Login
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-app = FastAPI()
-
-# Allow CORS for the React frontend
-origins = [
-    f"http://localhost:{os.getenv('FRONTEND_PORT')}",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+from urllib.parse import unquote
+from database import get_db, test_db_connection
+from models import (
+    SessionLocal, Users
 )
 
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the FastAPI backend!"}
+# Initialize router instead of app
+router = APIRouter()
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: str = None):
-    return {"item_id": item_id, "q": q}
+@router.get("/api/health")
+def health_check():
+    return {"status": "healthy"}
 
-@app.post("/items/")
-def create_item(item: dict):
-    return {"item": item}
+@router.get("/api/db-check")
+def db_check():
+    db_status = test_db_connection()
+    return {
+        "status": "connected" if db_status else "disconnected"
+    }
 
-# Pydantic model for login request validation
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+@router.get("/login")
+def login(user_id: int, password: str, db: Session = Depends(get_db)):
+    user = db.query(Users).filter(Users.user_id == user_id).first()
+    if user and user.password == password:
+        return {"success": True, "user_id": user.user_id}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
 
-# Dependency to get the database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-# Create a route to handle the form submission
-@app.get('/login')
-def submit(login_request: LoginRequest, db: Session = Depends(get_db)):
-    email = login_request.email
-    passwd = login_request.password
-
-    # Compare against database
-    login = db.query(Login).filter_by(email=email).first()
-
-    if login and login.passwd == passwd:
-        # Generate and send verification code
-        return {"success": True, "message": "Login successful"}
-    else:
-        raise HTTPException(status_code=400, detail="Invalid credentials")

@@ -56,6 +56,7 @@ services:
       - DATABASE_USER=${USER}
       - DATABASE_PASSWORD=${PASSWORD}
       - DATABASE_NAME=${DATABASE}
+      - FRONTEND_PORT=${FRONTEND_PORT}
     depends_on:
       db:
         condition: service_healthy

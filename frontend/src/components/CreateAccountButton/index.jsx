@@ -4,12 +4,9 @@ import './styles.css'
 const CreateAccountButton = () => {
   const navigate = useNavigate()
   return (
-    <button 
-      className="create-account-button" 
-      onClick={() => navigate('/register')}
-    >
-      Create Account
-    </button>
+    <div className="create-account-text">
+      New here? <a onClick={() => navigate('/register')}>Create an account</a>
+    </div>
   )
 }
 
