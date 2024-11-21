@@ -2,13 +2,16 @@ services:
   db:
     image: mysql/mysql-server:latest
     container_name: db
-    ports:
-      - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${ROOT_PASSWORD}
       MYSQL_DATABASE: ${DATABASE}
       MYSQL_USER: ${USER}
       MYSQL_PASSWORD: ${PASSWORD}
+      MYSQL_TCP_PORT: ${PORT}
+    ports:
+      - 3307:3307
+    expose:
+      - 3307
     volumes:
       - ./database/data:/var/lib/mysql
     networks:
@@ -49,7 +52,7 @@ services:
       - ./backend:/app
     environment:
       - DATABASE_HOST=db
-      - DATABASE_PORT=3306
+      - DATABASE_PORT=${PORT}
       - DATABASE_USER=${USER}
       - DATABASE_PASSWORD=${PASSWORD}
       - DATABASE_NAME=${DATABASE}
