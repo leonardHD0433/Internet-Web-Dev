@@ -1,8 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './styles.css';
 import Logo from '../../components/Logo';
 
-const CreateAccountPage = ({ onRegister }) => {
+const CreateAccountPage = () => {
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -21,7 +24,7 @@ const CreateAccountPage = ({ onRegister }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -37,8 +40,31 @@ const CreateAccountPage = ({ onRegister }) => {
       return;
     }
 
-    // Call the onRegister prop from App.jsx
-    onRegister(formData);
+    const queryParams = new URLSearchParams({
+      name: formData.name,
+      email: formData.email,
+      username: formData.username,
+      password: formData.password,
+    });
+  
+    try {
+      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_REGISTER_PATH}?${queryParams.toString()}`
+      console.info('Register request URL:', url) // For debugging
+      
+      const response = await fetch(url, {
+        method: 'GET',
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Registered Successfully');
+        navigate('/');
+      } else {
+        setError(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError('An error occurred');
+    }
   };
 
   return (
