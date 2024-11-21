@@ -244,6 +244,43 @@ with engine.connect() as sql_con:
                         FOREIGN KEY (`writer_id`) REFERENCES writer(`writer_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
+
+        
+    print("Creating user table...")
+    sql_con.execute(text("""
+                        CREATE TABLE `users` (
+                        `user_id` int(20) NOT NULL AUTO_INCREMENT,
+                        `password` varchar(20) NOT NULL,
+                        PRIMARY KEY (`user_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    print("Creating user search table...")
+    sql_con.execute(text("""
+                        CREATE TABLE `usersearch` (
+                        `user_id` int(20) NOT NULL,
+                        `genre_id` int(20) NOT NULL,
+                        `genre_label` varchar(50) DEFAULT NULL,
+                        `search_count` int(10) DEFAULT 0,
+                        PRIMARY KEY (`user_id`,`genre_id`),
+                        KEY `genre_id` (`genre_id`),
+                        CONSTRAINT `usersearch_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+                        CONSTRAINT `usersearch_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genre` (`genre_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+
+    print("Creating watchlist table...")
+    sql_con.execute(text("""
+                        CREATE TABLE `watchlist` (
+                        `user_id` int(20) NOT NULL,
+                        `movie_id` int(20) NOT NULL,
+                        PRIMARY KEY (`movie_id`,`user_id`),
+                        KEY `user_id` (`user_id`),
+                        CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
+                        CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+                        ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
     
 # import dfs into SQL tables
 print("Importing into movie...")
