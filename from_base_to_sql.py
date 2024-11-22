@@ -167,14 +167,14 @@ with engine.connect() as sql_con:
                         `overview` text DEFAULT NULL,
                         `popularity` double DEFAULT NULL,
                         `release_year` year DEFAULT NULL,
-                        `imdb_rating` int(4) DEFAULT NULL,
+                        `imdb_rating` double DEFAULT NULL,
                         PRIMARY KEY (`movie_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin"""))
     
     print("Creating actor table...")
     sql_con.execute(text("""
                         CREATE TABLE `actor` (
-                        `actor_id` int(10) NOT NULL,
+                        `actor_id` int(20) NOT NULL,
                         `actor_name` varchar(50) DEFAULT NULL,
                         PRIMARY KEY (`actor_id`)
                         ) 
@@ -184,7 +184,7 @@ with engine.connect() as sql_con:
     print("Creating director table...")
     sql_con.execute(text("""
                         CREATE TABLE `director` (
-                        `director_id` int(10) NOT NULL,
+                        `director_id` int(20) NOT NULL,
                         `director_name` varchar(50) DEFAULT NULL,
                         PRIMARY KEY (`director_id`)
                         ) 
@@ -270,6 +270,8 @@ with engine.connect() as sql_con:
                         CREATE TABLE `users` (
                         `user_id` int(20) NOT NULL AUTO_INCREMENT,
                         `password` varchar(20) NOT NULL,
+                        `user_name` varchar(50) NOT NULL,
+                        `user_email` varchar(50) NOT NULL,
                         PRIMARY KEY (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
