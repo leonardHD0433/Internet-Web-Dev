@@ -107,9 +107,11 @@ def preprocessing(base):
     MovieWriter.drop_duplicates(inplace=True)
     MovieGenre.drop_duplicates(inplace=True)
 
-    # Mapping the range of popularity values to a range of 0-100
+    # Mapping the range of popularity values/IMDB ratings to a range of 0-100
     initial_pop_max = base.popularity.max()
+    initial_imdb_max = base["IMDB_Rating"].max()
     base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
+    base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
