@@ -46,6 +46,7 @@ class Movie(Base):
     overview = Column(Text, nullable=True)
     popularity = Column(Double, nullable=True)
     release_year = Column(Integer, nullable=True)
+    imdb_rating = Column(Double, nullable=True)
 
 class MovieActor(Base):
     __tablename__ = "movieactor"

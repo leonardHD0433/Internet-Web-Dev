@@ -36,7 +36,7 @@ def remove_non_ascii(text):
 
 def preprocessing(base):
     # Converting dates in dataset to standard date format, highly important to ensure dates are properly imported into SQL
-    base.release_date = pd.to_datetime(base.release_date)
+    base.release_date = pd.to_datetime(base.release_date, dayfirst=True)
 
     # Dropping all columns with significant (>50%) amount of null values (with the exception of IMDB rating)
     base.drop(columns=["imdb_id","tagline","production_companies","production_countries","spoken_languages","AverageRating","Poster_Link","Certificate","Meta_score","Star1","Star2","Star3","Star4","Director_of_Photography","Producers","Music_Composer"], inplace=True)
@@ -77,7 +77,7 @@ def preprocessing(base):
     # making new id one, reordering cols
     # base.drop(columns=["id"], inplace=True)
     base["movie_id"] = range(1, len(base) + 1)
-    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9]]
+    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9,11]]
 
     actors.columns = ["actor_id","actor_name"]
     director.columns = ["director_id","director_name"]
@@ -89,7 +89,7 @@ def preprocessing(base):
     MovieGenre = match_ids(base, MovieGenre, genres, genres.columns[0], genres.columns[1])
     MovieWriter = match_ids(base, MovieWriter, writer, writer.columns[0], writer.columns[1])
 
-    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10]] # reordering to remove old id col
+    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11]] # reordering to remove old id col
 
     # removing non-ascii chars
     base = base.map(remove_non_ascii)
@@ -109,21 +109,27 @@ def preprocessing(base):
     MovieWriter.drop_duplicates(inplace=True)
     MovieGenre.drop_duplicates(inplace=True)
 
+    # Mapping the range of popularity values/IMDB ratings to a range of 0-100
+    initial_pop_max = base.popularity.max()
+    initial_imdb_max = base["IMDB_Rating"].max()
+    base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
+    base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
+
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
 
 # exporting to csv, feel free to comment if you want
-# Movie.to_csv("Movie.csv", index=False)
-# Director.to_csv("Director.csv", index=False)
-# Writer.to_csv("Writer.csv", index=False)
-# Genre.to_csv("Genre.csv", index=False)
-# Actor.to_csv("Actor.csv", index=False)
+Movie.to_csv("Movie.csv", index=False)
+Director.to_csv("Director.csv", index=False)
+Writer.to_csv("Writer.csv", index=False)
+Genre.to_csv("Genre.csv", index=False)
+Actor.to_csv("Actor.csv", index=False)
 
-# MovieDirector.to_csv("MovieDirector.csv", index=False)
-# MovieWriter.to_csv("MovieWriter.csv", index=False)
-# MovieGenre.to_csv("MovieGenre.csv", index=False)
-# MovieActor.to_csv("MovieActor.csv", index=False)
+MovieDirector.to_csv("MovieDirector.csv", index=False)
+MovieWriter.to_csv("MovieWriter.csv", index=False)
+MovieGenre.to_csv("MovieGenre.csv", index=False)
+MovieActor.to_csv("MovieActor.csv", index=False)
 
 # MySQL connection credentials
 username = os.getenv("USER")
@@ -134,13 +140,24 @@ database = os.getenv("DATABASE")
 # Create a MySQL connection engine using SQLAlchemy
 # NOTES: MUST INCREASE MAX_PACKET_SIZE to 50M in bin config
 engine = create_engine(f"mysql+mysqlconnector://{username}:{password}@{host}/{database}")
-
 # create tables and set PKs, SKs
 with engine.connect() as sql_con:
+    # Dropping tables from db, if exists used to prevent errors if table does not exist, before re-creating, foreign key check needs to be disabled to allow tables to drop properly
+    print("Attempting to delete existing tables..")
+    sql_con.execute(text("""
+                        SET FOREIGN_KEY_CHECKS = 0;
+                        """))
+    sql_con.execute(text("""
+                         DROP TABLE IF EXISTS `actor`, `director`, `genre`, `movie`, `movieactor`, `moviedirector`, `moviegenre`, `moviewriter`, `writer`,`users`,`usersearch`,`watchlist`;
+                         """))
+    sql_con.execute(text("""
+                        SET FOREIGN_KEY_CHECKS = 0;
+                        """))
+    
     # Independent tables
     print("Creating movie table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `movie` (
+                        CREATE TABLE `movie` (
                         `movie_id` int(20) NOT NULL,
                         `title` varchar(250) DEFAULT NULL,
                         `status` varchar(50) DEFAULT NULL,
@@ -151,13 +168,14 @@ with engine.connect() as sql_con:
                         `overview` text DEFAULT NULL,
                         `popularity` double DEFAULT NULL,
                         `release_year` year DEFAULT NULL,
+                        `imdb_rating` double DEFAULT NULL,
                         PRIMARY KEY (`movie_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin"""))
     
     print("Creating actor table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `actor` (
-                        `actor_id` int(10) NOT NULL,
+                        CREATE TABLE `actor` (
+                        `actor_id` int(20) NOT NULL,
                         `actor_name` varchar(100) DEFAULT NULL,
                         PRIMARY KEY (`actor_id`)
                         ) 
@@ -166,8 +184,8 @@ with engine.connect() as sql_con:
     
     print("Creating director table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `director` (
-                        `director_id` int(10) NOT NULL,
+                        CREATE TABLE `director` (
+                        `director_id` int(20) NOT NULL,
                         `director_name` varchar(100) DEFAULT NULL,
                         PRIMARY KEY (`director_id`)
                         ) 
@@ -176,7 +194,7 @@ with engine.connect() as sql_con:
     
     print("Creating genre table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `genre` (
+                        CREATE TABLE `genre` (
                         `genre_id` int(20) NOT NULL,
                         `genre_label` varchar(50) DEFAULT NULL,
                         PRIMARY KEY (`genre_id`)
@@ -186,7 +204,7 @@ with engine.connect() as sql_con:
     
     print("Creating writer table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `writer` (
+                        CREATE TABLE `writer` (
                         `writer_id` int(20) NOT NULL,
                         `writer_name` varchar(100) DEFAULT NULL,
                         PRIMARY KEY (`writer_id`)
@@ -197,7 +215,7 @@ with engine.connect() as sql_con:
     # Dependent tables
     print("Creating movieactor table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `movieactor` (
+                        CREATE TABLE `movieactor` (
                         `movie_id` int(20) NOT NULL,
                         `actor_id` int(20) NOT NULL,
                         `title` varchar(250) DEFAULT NULL,
@@ -210,7 +228,7 @@ with engine.connect() as sql_con:
     
     print("Creating moviedirector table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `moviedirector` (
+                        CREATE TABLE `moviedirector` (
                         `movie_id` int(20) NOT NULL,
                         `director_id` int(20) NOT NULL,
                         `title` varchar(250) DEFAULT NULL,
@@ -223,7 +241,7 @@ with engine.connect() as sql_con:
     
     print("Creating moviegenre table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `moviegenre` (
+                        CREATE TABLE `moviegenre` (
                         `movie_id` int(20) NOT NULL,
                         `genre_id` int(20) NOT NULL,
                         `title` varchar(250) DEFAULT NULL,
@@ -236,7 +254,7 @@ with engine.connect() as sql_con:
     
     print("Creating moviewriter table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `moviewriter` (
+                        CREATE TABLE `moviewriter` (
                         `movie_id` int(20) NOT NULL,
                         `writer_id` int(20) NOT NULL,
                         `title` varchar(250) DEFAULT NULL,
@@ -250,19 +268,18 @@ with engine.connect() as sql_con:
         
     print("Creating user table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `users` (
+                        CREATE TABLE `users` (
                         `user_id` int(20) NOT NULL AUTO_INCREMENT,
-                        `username` varchar(20) NOT NULL,
                         `password` varchar(20) NOT NULL,
-                        `email` varchar(50) NOT NULL,
-                        `name` varchar(100) DEFAULT NULL,
+                        `user_name` varchar(100) NOT NULL,
+                        `user_email` varchar(50) NOT NULL,
                         PRIMARY KEY (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
     print("Creating user search table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `usersearch` (
+                        CREATE TABLE `usersearch` (
                         `user_id` int(20) NOT NULL,
                         `genre_id` int(20) NOT NULL,
                         `genre_label` varchar(50) DEFAULT NULL,
@@ -276,7 +293,7 @@ with engine.connect() as sql_con:
 
     print("Creating watchlist table...")
     sql_con.execute(text("""
-                        CREATE TABLE IF NOT EXISTS `watchlist` (
+                        CREATE TABLE `watchlist` (
                         `user_id` int(20) NOT NULL,
                         `movie_id` int(20) NOT NULL,
                         PRIMARY KEY (`movie_id`,`user_id`),
@@ -308,3 +325,7 @@ MovieGenre.to_sql('moviegenre', con=engine, if_exists='append', index=False)
 print("Importing into moviewriter...")
 MovieWriter.to_sql('moviewriter', con=engine, if_exists='append', index=False)
 print(f"Database {database} has been initialized!")
+
+
+
+
