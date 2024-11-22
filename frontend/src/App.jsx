@@ -7,6 +7,7 @@ import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
 import './App.css'
+import ActorRanking from './pages/ActorDashboard'
 
 function App() {
   const [showTest, setShowTest] = useState(false)
@@ -59,7 +60,9 @@ function App() {
             <Navigate to="/" replace />
           )
         } />
+
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/actor-ranking" element={<ActorRanking />} />
       </Routes>
       {showTest && (
         <div className="test-overlay">
