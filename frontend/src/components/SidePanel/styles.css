@@ -1,0 +1,117 @@
+.side-panel {
+    width: 50px; /* Default to collapsed state */
+    height: 100vh; /* Fit the screen height */
+    padding: 30px 22px;
+    background: #383C46;
+    box-shadow: 0px 9px 94px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s;
+    position: fixed; /* Position it on the left side */
+    left: 0; /* Align to the left */
+    overflow: hidden;
+}
+
+.side-panel:hover {
+    width: 300px; /* Expand on hover */
+}
+
+.panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: opacity 0.3s;
+    flex-grow: 1;
+}
+
+.side-panel:hover .panel-content {
+    opacity: 1; /* Show content on hover */
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.panel-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    background: #383C46;
+    color: white;
+    white-space: nowrap;
+    transition: background 0.3s;
+}
+
+.panel-item:hover {
+    background: #667A8A;
+}
+
+.panel-item.compare {
+    background: #383C46;
+}
+
+.panel-item.logout {
+    background: #383C46;
+}
+
+.panel-exit {
+    margin-top: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.side-panel:hover .panel-exit {
+    margin-top: 130px;
+}
+
+.panel-exit .status-button {
+    position: static;  /* Override fixed position */
+    width: 100%;      /* Take full width of container */
+    justify-content: flex-start;
+    background: #383C46;
+    display: none;
+}
+
+.side-panel:hover .panel-exit .status-button {
+    display: flex; /* Show on hover */
+}
+
+.icon {
+    width: 30px;
+    height: 30px;
+    background: transparent;
+}
+
+.label {    
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    line-height: 22px;
+    letter-spacing: 0.15px;
+    display: none;
+}
+
+.side-panel:hover .label {
+    display: inline-block;
+}
+
+.logo, .text-img {
+    display: none;
+}
+
+.side-panel:hover .logo, .side-panel:hover .text-img {
+    display: block;
+}

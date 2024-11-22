@@ -6,6 +6,7 @@ import Logo from './components/Logo'
 import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
+import MainLayout from './components/MainLayout'
 import './App.css'
 
 function App() {
@@ -64,19 +65,26 @@ function App() {
 
   return (
     <div className="app">
-      <StatusButton status={connectionStatus} onClick={handleStatusClick} />
       <Routes>
         <Route path="/" element={
           <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
             <Logo />
             <LoginForm onSubmit={handleLogin} />
             <CreateAccountButton />
           </div>
         } />
-        <Route path="/register" element={<CreateAccountPage />} />
+        <Route path="/register" element={
+          <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
+            <CreateAccountPage />
+          </div>
+        } />
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            <div>Dashboard Page</div>
+            <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
+              <div>Dashboard Page</div>
+            </MainLayout>
           ) : (
             <Navigate to="/" replace />
           )
