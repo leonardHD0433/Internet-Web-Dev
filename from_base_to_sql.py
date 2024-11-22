@@ -34,7 +34,7 @@ def remove_non_ascii(text):
 
 def preprocessing(base):
     # Converting dates in dataset to standard date format, highly important to ensure dates are properly imported into SQL
-    base.release_date = pd.to_datetime(base.release_date)
+    base.release_date = pd.to_datetime(base.release_date, dayfirst=True)
 
     # Dropping all columns with significant (>50%) amount of null values (with the exception of IMDB rating)
     base.drop(columns=["imdb_id","tagline","production_companies","production_countries","spoken_languages","AverageRating","Poster_Link","Certificate","Meta_score","Star1","Star2","Star3","Star4","Director_of_Photography","Producers","Music_Composer"], inplace=True)
@@ -75,7 +75,7 @@ def preprocessing(base):
     # making new id one, reordering cols
     # base.drop(columns=["id"], inplace=True)
     base["movie_id"] = range(1, len(base) + 1)
-    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9]]
+    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9,11]]
 
     actors.columns = ["actor_id","actor_name"]
     director.columns = ["director_id","director_name"]
@@ -87,7 +87,7 @@ def preprocessing(base):
     MovieGenre = match_ids(base, MovieGenre, genres, genres.columns[0], genres.columns[1])
     MovieWriter = match_ids(base, MovieWriter, writer, writer.columns[0], writer.columns[1])
 
-    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10]] # reordering to remove old id col
+    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11]] # reordering to remove old id col
 
     # removing non-ascii chars
     base = base.map(remove_non_ascii)
@@ -135,6 +135,18 @@ engine = create_engine(f"mysql+mysqlconnector://{username}:{password}@{host}/{da
 
 # create tables and set PKs, SKs
 with engine.connect() as sql_con:
+    # Dropping tables from db, if exists used to prevent errors if table does not exist, before re-creating, foreign key check needs to be disabled to allow tables to drop properly
+    print("Attempting to delete existing tables..")
+    sql_con.execute(text("""
+                        SET FOREIGN_KEY_CHECKS = 0;
+                        """))
+    sql_con.execute(text("""
+                         DROP TABLE IF EXISTS `actor`, `director`, `genre`, `movie`, `movieactor`, `moviedirector`, `moviegenre`, `moviewriter`, `writer`,`users`,`usersearch`,`watchlist`;
+                         """))
+    sql_con.execute(text("""
+                        SET FOREIGN_KEY_CHECKS = 0;
+                        """))
+    
     # Independent tables
     print("Creating movie table...")
     sql_con.execute(text("""
@@ -149,6 +161,7 @@ with engine.connect() as sql_con:
                         `overview` text DEFAULT NULL,
                         `popularity` double DEFAULT NULL,
                         `release_year` year DEFAULT NULL,
+                        `imdb_rating` int(4) DEFAULT NULL,
                         PRIMARY KEY (`movie_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin"""))
     
