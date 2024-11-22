@@ -107,6 +107,10 @@ def preprocessing(base):
     MovieWriter.drop_duplicates(inplace=True)
     MovieGenre.drop_duplicates(inplace=True)
 
+    # Mapping the range of popularity values to a range of 0-100
+    initial_pop_max = base.popularity.max()
+    base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
+
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
