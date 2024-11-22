@@ -6,6 +6,7 @@ import Logo from './components/Logo'
 import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
+import MainLayout from './components/MainLayout'
 import './App.css'
 import ActorRanking from './pages/ActorDashboard'
 
@@ -13,20 +14,44 @@ function App() {
   const [showTest, setShowTest] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('checking')
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
   const navigate = useNavigate()
 
   const handleStatusClick = () => setShowTest(!showTest)
   const handleClose = () => setShowTest(false)
 
-  const handleLogin = () => { 
-    setIsAuthenticated(true)
-    navigate('/dashboard')
-  }
+  const handleLogin = async (credentials) => { 
+    try {
+      setIsLoading(true)
+      setError(null)
+      
+      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_LOGIN_PATH}?email=${credentials.email}&password=${credentials.password}`
+      console.info('Login request URL:', url)
 
-  const handleRegister = (event) => {
-    event.preventDefault()
-    // Add registration logic here
-    navigate('/')
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      console.info('Response status:', response.status)
+
+      if (!response.ok) {
+        throw new Error('Invalid credentials')
+      }
+  
+      const data = await response.json()
+      localStorage.setItem('user', JSON.stringify(data))
+      setIsAuthenticated(true)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message)
+      setIsAuthenticated(false)
+    } finally {
+      setIsLoading(false) 
+    }
   }
 
   const handleStatusUpdate = (apiStatus, dbStatus) => {
@@ -41,21 +66,26 @@ function App() {
 
   return (
     <div className="app">
-      <StatusButton status={connectionStatus} onClick={handleStatusClick} />
       <Routes>
         <Route path="/" element={
           <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
             <Logo />
             <LoginForm onSubmit={handleLogin} />
             <CreateAccountButton />
           </div>
         } />
         <Route path="/register" element={
-          <CreateAccountPage onRegister={handleRegister} />
+          <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
+            <CreateAccountPage />
+          </div>
         } />
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            <div>Dashboard Page</div>
+            <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
+              <div>Dashboard Page</div>
+            </MainLayout>
           ) : (
             <Navigate to="/" replace />
           )

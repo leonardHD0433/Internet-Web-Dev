@@ -40,3 +40,19 @@
 .login-button:hover {
     background-color: #535bf2;
 }
+
+.error-message {
+    color: #f44336;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.login-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+}
+
+.login-input:disabled {
+    background: #eeeeee;
+    cursor: not-allowed;
+}
