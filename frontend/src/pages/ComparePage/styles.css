@@ -1,0 +1,57 @@
+.compare-container {
+    position: fixed;
+    width: 100%; /* Ensure the container takes the full width */
+    height: 100%; /* Ensure the container takes the full height */
+    display: flex;
+    align-items: center; /* Center the content vertically */
+    flex-direction: column;
+    margin-top: 200px;
+    margin-left: 100px;
+}
+
+.compare-space {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    width: 1300px;
+    height: 280px;
+    margin-bottom: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    /* background: wheat; */ /* Uncomment to see the space */
+}
+  
+.compare-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 531px;
+    height: 100%;
+    background: lightgray;
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.compare-graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 700px;
+    height: 318px;
+    /* background: wheat; */ /* Uncomment to see the space */
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.compare-graph-comment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 531px;
+    height: 100%;
+    background: lightgray;
+    border-radius: 20px;
+}

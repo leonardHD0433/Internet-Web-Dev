@@ -10,6 +10,7 @@ html, body {
   height: 100%;
   display: flex;
   background: #282F35;
+  overflow: hidden;
 }
 
 .side-panel {
@@ -113,6 +114,7 @@ html, body {
   justify-content: space-between;
   align-items: center;
   background-color: #282F35;
+  z-index: 2;
 }
 
 .search-bar {

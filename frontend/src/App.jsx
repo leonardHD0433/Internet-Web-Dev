@@ -7,6 +7,8 @@ import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
 import DashBoard from './pages/DashboardPage'
+import MainLayout from './components/MainLayout'
+import ComparePage from './pages/ComparePage';
 import './App.css'
 
 function App() {
@@ -80,13 +82,23 @@ function App() {
             <CreateAccountPage />
           </div>
         } />
-        <Route path="/dashboard" element={
-          isAuthenticated ? (
-            <DashBoard connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}/>
-          ) : (
-            <Navigate to="/" replace />
-          )
-        } />
+        {isAuthenticated ? (
+          <Route
+            path="/dashboard/*"
+            element={
+              <MainLayout
+                connectionStatus={connectionStatus}
+                handleStatusClick={handleStatusClick}
+              />
+            }
+          >
+            <Route index element={<DashBoard />}
+            />
+            <Route path="compare" element={<ComparePage />} />
+          </Route>
+        ) : (
+          <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
+        )}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {showTest && (
