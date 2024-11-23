@@ -5,7 +5,7 @@ from database import get_db
 from urllib.parse import unquote
 from database import get_db, test_db_connection
 from models import (
-    SessionLocal, Actor, Director, Genre, MovieGenre, Movie, MovieActor, Users
+    SessionLocal, Actor,Watchlist, Director, Genre, MovieGenre, Movie, MovieActor, Users
 )
 
 # Initialize router instead of app
@@ -38,7 +38,6 @@ def actor_ranking(db: Session = Depends(get_db)):
         Actor.actor_name,
         func.avg(Movie.popularity).label('average_popularity'),
         func.avg(Movie.imdb_rating).label('average_imdb_rating'),
-        (func.avg(Movie.popularity) + func.avg(Movie.imdb_rating)).label('combined_metric'),
         func.count(Movie.movie_id).label('movie_count')
     ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
     ).join(Movie, MovieActor.movie_id == Movie.movie_id
@@ -47,7 +46,25 @@ def actor_ranking(db: Session = Depends(get_db)):
     ).order_by(((func.avg(Movie.popularity) + func.avg(Movie.imdb_rating))).desc()
     ).limit(3).all()
 
-    # Find the most common genre for the 3 actors
+    # Query the top 3 most common actors in the watchlist
+    watchlist_actors = db.query(
+        Actor.actor_id,
+        Actor.actor_name,
+        func.avg(Movie.popularity).label('average_popularity'),
+        func.avg(Movie.imdb_rating).label('average_imdb_rating'),
+        func.count(Watchlist.movie_id).label('watchlist_count')
+    ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
+    ).join(Watchlist, MovieActor.movie_id == Watchlist.movie_id
+    ).join(Movie, MovieActor.movie_id == Movie.movie_id
+    ).group_by(Actor.actor_id, Actor.actor_name
+    ).order_by(func.count(Watchlist.movie_id).desc()
+    ).limit(3).all()
+
+    # Append the watchlist actors to the actor_popularity list
+    for actor in watchlist_actors:
+        actor_popularity.append(actor)
+
+    # Find the most common genre for the 6 actors
     actor_genres = {}
     for actor in actor_popularity:
         common_genre = db.query(
@@ -72,9 +89,8 @@ def actor_ranking(db: Session = Depends(get_db)):
                 "actor_name": actor.actor_name,
                 "average_popularity": actor.average_popularity,
                 "average_imdb_rating": actor.average_imdb_rating,
-                "combined_metric": actor.combined_metric,
                 "most_common_genre": actor_genres[actor.actor_id],
-                "movie_count": actor.movie_count
+                "movie_count": actor.movie_count if hasattr(actor, 'movie_count') else actor.watchlist_count
             } for actor in actor_popularity
         ]
     }

@@ -4,16 +4,30 @@
     padding: 20px;
 }
 
+.main-content {
+    display: flex;
+    gap: 20px; 
+    width: 100%; 
+    flex-shrink: 0;
+
+    overflow: scroll;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center; 
+}
+
 .ovr-container{
     position:relative;
     width: 648px;
     height: 462px;
-    top: 129px;
+    top: 0px;
     left: 10px;
     gap: 0px;
     flex-shrink: 0;
 
-    overflow: scroll;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
