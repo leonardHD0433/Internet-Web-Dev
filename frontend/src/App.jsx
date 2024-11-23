@@ -8,6 +8,7 @@ import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
 import MainLayout from './components/MainLayout'
 import './App.css'
+import './styles/index.css'
 import ActorRanking from './pages/ActorDashboard'
 
 function App() {
@@ -92,7 +93,7 @@ function App() {
         } />
 
         <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/actor-ranking" element={<ActorRanking />} />
+        <Route path="/actor-ranking" element={<ActorRanking connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />} />
       </Routes>
       {showTest && (
         <div className="test-overlay">

@@ -32,15 +32,19 @@ def login(user_id: int, password: str, db: Session = Depends(get_db)):
 
 @router.get("/actorRanking")
 def actor_ranking(db: Session = Depends(get_db)):
-    # Select the top 3 most popular actors
+    # Select the top 3 actors based on the average value of average popularity and average IMDb rating
     actor_popularity = db.query(
         Actor.actor_id,
         Actor.actor_name,
-        func.avg(Movie.popularity).label('average_popularity')
+        func.avg(Movie.popularity).label('average_popularity'),
+        func.avg(Movie.imdb_rating).label('average_imdb_rating'),
+        (func.avg(Movie.popularity) + func.avg(Movie.imdb_rating)).label('combined_metric'),
+        func.count(Movie.movie_id).label('movie_count')
     ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
     ).join(Movie, MovieActor.movie_id == Movie.movie_id
     ).group_by(Actor.actor_id, Actor.actor_name
-    ).order_by(func.avg(Movie.popularity).desc()
+    ).having(func.count(Movie.movie_id) >= 10  # Filter out actors with less than 5 movies
+    ).order_by(((func.avg(Movie.popularity) + func.avg(Movie.imdb_rating))).desc()
     ).limit(3).all()
 
     # Find the most common genre for the 3 actors
@@ -62,23 +66,15 @@ def actor_ranking(db: Session = Depends(get_db)):
         else:
             actor_genres[actor.actor_id] = "No Data"
 
-    # Find the number of movies each actor has acted in
-    actor_movies = {}
-    for actor in actor_popularity:
-        movies = db.query(
-            func.count(Movie.movie_id).label('movie_count'),
-        ).join(MovieActor, Movie.movie_id == MovieActor.movie_id
-        ).filter(MovieActor.actor_id == actor.actor_id
-        ).scalar()
-        actor_movies[actor.actor_id] = movies
-
     return {
         "actors": [
             {
                 "actor_name": actor.actor_name,
                 "average_popularity": actor.average_popularity,
+                "average_imdb_rating": actor.average_imdb_rating,
+                "combined_metric": actor.combined_metric,
                 "most_common_genre": actor_genres[actor.actor_id],
-                "movie_count": actor_movies[actor.actor_id]
+                "movie_count": actor.movie_count
             } for actor in actor_popularity
         ]
     }
