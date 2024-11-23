@@ -68,14 +68,15 @@
 }
 
 .panel-exit {
-    margin-top: 230px;
+    margin-top: auto;
+    margin-bottom: 50px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
 .side-panel:hover .panel-exit {
-    margin-top: 110px;
+    margin-top: auto;
 }
 
 .panel-exit .status-button {
