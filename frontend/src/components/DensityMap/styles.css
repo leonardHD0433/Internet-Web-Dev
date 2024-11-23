@@ -1,0 +1,10 @@
+.density-plot {
+    width: 100%;
+    height: 100%;
+}
+
+.density-plot path {
+    fill: none;
+    stroke: #69b3a2;
+    stroke-width: 2;
+}

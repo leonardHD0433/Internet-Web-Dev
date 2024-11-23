@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 import SidePanel from '../../components/SidePanel';
-import './styles.css'
+import { StackedBarplot } from '../../components/StackedBarPlot/';
+import { data } from '../../components/StackedBarPlot/data'; 
+import './styles.css';
 
 function ActorRanking({ connectionStatus, handleStatusClick }) { 
     const [actors, setActors] = useState([]);
@@ -121,7 +123,10 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
             <div className="mid-row">
                 <div className="heatmap-box">Box 1</div>
                 <div className="spread-box">Box 2</div>
-                <div className="bar-box">Box 3</div>
+                <div className="bar-box">
+                <strong>Top 5 Most Prolific Actors</strong>
+                    <StackedBarplot data={data} width={400} height={275} />
+                </div>
             </div>
         </div>
     );
