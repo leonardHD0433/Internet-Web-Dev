@@ -6,7 +6,7 @@ import Logo from './components/Logo'
 import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
-import MainLayout from './components/MainLayout'
+import DashBoard from './pages/DashboardPage'
 import './App.css'
 
 function App() {
@@ -82,9 +82,7 @@ function App() {
         } />
         <Route path="/dashboard" element={
           isAuthenticated ? (
-            <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
-              <div>Dashboard Page</div>
-            </MainLayout>
+            <DashBoard connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}/>
           ) : (
             <Navigate to="/" replace />
           )

@@ -1,0 +1,18 @@
+.compare-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 20px;
+  background: purple;
+  z-index: 50;
+}
+
+.compare-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height: 100%;
+  background: yellow;
+  z-index: 3;
+}
