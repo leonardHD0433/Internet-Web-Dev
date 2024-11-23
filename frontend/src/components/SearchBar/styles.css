@@ -1,0 +1,33 @@
+.search-container {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+.search-container .MuiTextField-root {
+    width: 100%;
+}
+  
+.custom-textfield {
+    background-color: #ECE6F0;
+    border-radius: 28px;
+}
+
+.custom-textfield .MuiOutlinedInput-root {
+    border-radius: 28px;
+}
+
+.custom-textfield .MuiOutlinedInput-root:hover fieldset {
+    border-color: #667A8A;
+}
+
+.custom-textfield .MuiOutlinedInput-input::placeholder {
+    color: #667A8A;
+    opacity: 1;
+}
+
+/* Remove label styling since we're not using it */
+.custom-textfield .MuiInputLabel-root {
+    display: none;
+}

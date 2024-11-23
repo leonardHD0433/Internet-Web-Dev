@@ -1,4 +1,4 @@
-FROM node:22.9.0-alpine
+FROM node:22.11.0
 
 WORKDIR /app
 
@@ -6,9 +6,10 @@ ENV NODE_ENV=development
 ENV DEBUG=app:*
 
 COPY package*.json ./
-RUN npm install
 
 COPY . .
+
+RUN npm i
 
 EXPOSE 5173
 

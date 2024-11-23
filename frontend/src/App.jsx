@@ -68,7 +68,7 @@ function App() {
       <Routes>
         <Route path="/" element={
           <div className="main-content">
-            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} />
             <Logo />
             <LoginForm onSubmit={handleLogin} />
             <CreateAccountButton />
@@ -76,7 +76,7 @@ function App() {
         } />
         <Route path="/register" element={
           <div className="main-content">
-            <StatusButton status={connectionStatus} onClick={handleStatusClick} /> {/* Keep StatusButton here */}
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} />
             <CreateAccountPage />
           </div>
         } />
