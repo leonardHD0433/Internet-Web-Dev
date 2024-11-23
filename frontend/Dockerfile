@@ -9,7 +9,7 @@ COPY package*.json ./
 
 COPY . .
 
-RUN npm i
+RUN npm ci
 
 EXPOSE 5173
 

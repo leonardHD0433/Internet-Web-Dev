@@ -24,36 +24,52 @@ function App() {
 
   const handleLogin = async (credentials) => { 
     try {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
       
-      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_LOGIN_PATH}?email=${credentials.email}&password=${credentials.password}`
-      console.info('Login request URL:', url)
-
+      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_LOGIN_PATH}?email=${encodeURIComponent(credentials.email)}&password=${encodeURIComponent(credentials.password)}`;
+      console.info('Login request URL:', url);
+  
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         }
-      })
-
-      console.info('Response status:', response.status)
-
+      });
+  
+      const data = await response.json();
+  
       if (!response.ok) {
-        throw new Error('Invalid credentials')
+        const errorMsg = data.detail || 'Login failed'; // Get error message from API response
+        setError(errorMsg);
+        alert(errorMsg); // Show alert with API error message
+        setIsAuthenticated(false);
+        throw new Error(errorMsg);
       }
   
-      const data = await response.json()
-      localStorage.setItem('user', JSON.stringify(data))
-      setIsAuthenticated(true)
-      navigate('/dashboard')
+      if (data.success) {
+        // Store user data matching backend response
+        const userData = {
+          userId: data.user_id,
+          userName: data.user_name,
+          email: data.email
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        setIsAuthenticated(true);
+        navigate('/dashboard');
+      } else {
+        throw new Error('Login failed');
+      }
+  
     } catch (err) {
-      setError(err.message)
-      setIsAuthenticated(false)
+      console.error('Login error:', err);
+      setError(err.message);
+      setIsAuthenticated(false);
     } finally {
-      setIsLoading(false) 
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleStatusUpdate = (apiStatus, dbStatus) => {
     if (apiStatus === 'healthy' && dbStatus === 'connected') {

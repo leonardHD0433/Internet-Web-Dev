@@ -46,6 +46,7 @@ class Movie(Base):
     overview = Column(Text, nullable=True)
     popularity = Column(Double, nullable=True)
     release_year = Column(Integer, nullable=True)
+    imdb_rating = Column(Double, nullable=True)
 
 class MovieActor(Base):
     __tablename__ = "movieactor"
@@ -112,8 +113,10 @@ Writer.movies = relationship("MovieWriter", back_populates="writer")
 class Users(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    user_id = Column(Integer, primary_key=True, index=True, autoincrement=True, nullable=False)
     password = Column(String(20), nullable=False)
+    user_name = Column(String(100), nullable=False)
+    user_email = Column(String(50), nullable=False)
 
 class UserSearch(Base):
     __tablename__ = "usersearch"

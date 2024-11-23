@@ -24,6 +24,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('user');
     navigate('/');
   };
 

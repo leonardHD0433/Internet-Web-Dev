@@ -16,6 +16,16 @@ const CreateAccountPage = () => {
 
   const [error, setError] = useState('');
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: ''
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -54,7 +64,18 @@ const CreateAccountPage = () => {
       const response = await fetch(url, {
         method: 'GET',
       });
+
       const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 400) {
+          setError(data.detail || 'User already exists');  // Use API error message
+          resetForm();  // Clear form
+          return;  // Return early to prevent further execution
+        }
+        throw new Error(data.detail || 'Registration failed');
+      }
+
       if (data.success) {
         alert('Registered Successfully');
         navigate('/');
