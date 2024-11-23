@@ -83,6 +83,8 @@ def actor_ranking(db: Session = Depends(get_db)):
         else:
             actor_genres[actor.actor_id] = "No Data"
 
+        
+
     return {
         "actors": [
             {
