@@ -7,7 +7,7 @@ from database import get_db, test_db_connection
 from datetime import datetime
 import re
 from models import (
-    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre, MovieDirector, Director, Writer
+    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre, MovieDirector, Director, Writer, MovieWriter
 )
 
 # Initialize router instead of app
@@ -418,3 +418,90 @@ async def search(
             status_code=500,
             detail=f"Search failed: {str(e)}"
         )
+    
+@router.get("/search-movie", response_model=List[Dict[str, str]])
+async def search_movie(
+    query: str = Query(..., min_length=2, max_length=100),
+    db: Session = Depends(get_db)
+):
+    try:
+        # Sanitize query
+        query = unquote(query).strip()
+        if not query:
+            return []
+
+        # Split query for word matching
+        query_words = re.findall(r'\w+', query.lower())
+        
+        def calculate_relevance(title: str) -> float:
+            title_lower = title.lower()
+            score = 0
+            if title_lower == query.lower():
+                return 100
+            if title_lower.startswith(query.lower()):
+                score += 75
+            for word in query_words:
+                if word in title_lower:
+                    score += 25
+            return score
+
+        # Search movies
+        movies = db.query(Movie).filter(
+            Movie.title.ilike(f"%{query}%")
+        ).limit(10).all()
+        
+        results = []
+        for movie in movies:
+            if movie and movie.title:
+                relevance = calculate_relevance(movie.title)
+                results.append({
+                    "id": str(movie.movie_id),
+                    "name": movie.title,
+                    "type": "Movie",
+                    "year": str(movie.release_year),
+                    "relevance": relevance
+                })
+
+        # Sort by relevance
+        results.sort(key=lambda x: x["relevance"], reverse=True)
+        
+        # Remove relevance scores
+        for result in results:
+            result.pop("relevance", None)
+            
+        return results
+
+    except Exception as e:
+        print(f"Movie search failed: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Movie search failed: {str(e)}"
+        )
+
+#Fetch full movie details using movie ID
+@router.get("/search-movie/{movie_id}")
+def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
+    movie = db.query(Movie).filter(Movie.movie_id == movie_id).first()
+    if not movie:
+        raise HTTPException(
+            status_code=404,
+            detail="Movie not found"
+        )
+
+    # Get actors, directors, writers and genres for the movie
+    actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie_id).all()
+    directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie_id).all()
+    writers = db.query(Writer).join(MovieWriter).filter(MovieWriter.movie_id == movie_id).all()
+    genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie_id).all()
+
+    return {
+        "title": movie.title,
+        "overview": movie.overview,
+        "release_date": movie.release_date,
+        "popularity": movie.popularity,
+        "imdb_rating": movie.imdb_rating,
+        "actors": [actor.actor_name for actor in actors],
+        "directors": [director.director_name for director in directors],
+        "writers": [writer.writer_name for writer in writers],
+        "genres": [genre.genre_label for genre in genres]
+    }

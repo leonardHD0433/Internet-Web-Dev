@@ -32,6 +32,44 @@
     border-radius: 20px;
     margin-left: 50px;
     margin-right: 50px;
+    position: relative;
+}
+
+.add-movie-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #667A8A;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.add-movie-button:hover {
+    background-color: #546A7B;
+}
+
+.add-movie-button:focus {
+    outline: none;
+}
+
+.plus-icon {
+    font-size: 36px;
+    font-weight: bold;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 7px;
 }
 
 .compare-graph {
@@ -54,4 +92,16 @@
     height: 100%;
     background: lightgray;
     border-radius: 20px;
+}
+
+.MuiDialog-paper {
+    min-width: 400px;
+}
+  
+.MuiListItem-root {
+    cursor: pointer;
+}
+
+.MuiListItem-root:hover {
+    background-color: rgba(0, 0, 0, 0.04);
 }

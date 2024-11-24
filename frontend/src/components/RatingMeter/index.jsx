@@ -34,7 +34,7 @@ const Meter = ({ value }) => {
                     y1="50"
                     x2="10"
                     y2="50" /* Adjusted y2 to make the needle smaller */
-                    style={{ transform: `rotate(${0}deg)`, strokeWidth: strokeWidth }}
+                    style={{ transform: `rotate(${angle}deg)`, strokeWidth: strokeWidth }}
                 />
             </svg>
         </div>
