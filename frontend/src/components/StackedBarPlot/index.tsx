@@ -37,7 +37,15 @@ export const StackedBarplot = ({
   const stackSeries = d3.stack().keys(allSubgroups).order(d3.stackOrderNone);
   const series = stackSeries(data);
 
-  const max = 100; // todo
+  const max = useMemo(() => {
+    return Object.values(data[0]).reduce((sum:number, value) => {
+      if (typeof value === 'number' && Number.isInteger(value)) {
+        return sum + value;
+      }
+      return sum;
+    }, 0);
+  }, [data]);
+
   const yScale = useMemo(() => {
     return d3
       .scaleLinear()

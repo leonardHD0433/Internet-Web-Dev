@@ -33,25 +33,25 @@ def login(user_id: int, password: str, db: Session = Depends(get_db)):
 @router.get("/actorRanking")
 def actor_ranking(db: Session = Depends(get_db)):
     # Select the top 3 actors based on the average value of average popularity and average IMDb rating
-    actor_popularity = db.query(
+    actor_list = db.query(
         Actor.actor_id,
         Actor.actor_name,
-        func.avg(Movie.popularity).label('average_popularity'),
-        func.avg(Movie.imdb_rating).label('average_imdb_rating'),
+        func.avg(func.nullif(Movie.popularity, 0)).label('average_popularity'),
+        func.avg(func.nullif(Movie.imdb_rating, -1)).label('average_imdb_rating'),
         func.count(Movie.movie_id).label('movie_count')
     ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
     ).join(Movie, MovieActor.movie_id == Movie.movie_id
     ).group_by(Actor.actor_id, Actor.actor_name
-    ).having(func.count(Movie.movie_id) >= 10  # Filter out actors with less than 5 movies
-    ).order_by(((func.avg(Movie.popularity) + func.avg(Movie.imdb_rating))).desc()
+    ).having(func.count(Movie.movie_id) >= 10  # Filter out actors with less than 10 movies
+    ).order_by(((func.avg(func.nullif(Movie.popularity, 0)) + func.avg(func.nullif(Movie.imdb_rating, -1)))).desc()
     ).limit(3).all()
 
     # Query the top 3 most common actors in the watchlist
     watchlist_actors = db.query(
         Actor.actor_id,
         Actor.actor_name,
-        func.avg(Movie.popularity).label('average_popularity'),
-        func.avg(Movie.imdb_rating).label('average_imdb_rating'),
+        func.avg(func.nullif(Movie.popularity, 0)).label('average_popularity'),
+        func.avg(func.nullif(Movie.imdb_rating, -1)).label('average_imdb_rating'),
         func.count(Watchlist.movie_id).label('watchlist_count')
     ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
     ).join(Watchlist, MovieActor.movie_id == Watchlist.movie_id
@@ -62,11 +62,11 @@ def actor_ranking(db: Session = Depends(get_db)):
 
     # Append the watchlist actors to the actor_popularity list
     for actor in watchlist_actors:
-        actor_popularity.append(actor)
+        actor_list.append(actor)
 
     # Find the most common genre for the 6 actors
     actor_genres = {}
-    for actor in actor_popularity:
+    for actor in actor_list:
         common_genre = db.query(
             Genre.genre_label,
             func.count(Genre.genre_label).label('genre_count')
@@ -83,19 +83,23 @@ def actor_ranking(db: Session = Depends(get_db)):
         else:
             actor_genres[actor.actor_id] = "No Data"
 
-        
-
+    # Create a list of dictionaries with the required data
+    actors_data = []
+    for actor in actor_list:
+        actor_data = {
+            "actor_name": actor.actor_name,
+            "average_popularity": round(actor.average_popularity, 2) if actor.average_popularity else "No Data",
+            "average_imdb_rating": round(actor.average_imdb_rating, 2) if actor.average_imdb_rating else "No Data",
+            "most_common_genre": actor_genres[actor.actor_id],
+            "movie_count": actor.movie_count if hasattr(actor, 'movie_count') else actor.watchlist_count
+        }
+        actors_data.append(actor_data)
+            
     return {
-        "actors": [
-            {
-                "actor_name": actor.actor_name,
-                "average_popularity": actor.average_popularity,
-                "average_imdb_rating": actor.average_imdb_rating,
-                "most_common_genre": actor_genres[actor.actor_id],
-                "movie_count": actor.movie_count if hasattr(actor, 'movie_count') else actor.watchlist_count
-            } for actor in actor_popularity
-        ]
+        "actors": actors_data
     }
+
+
 
 @router.get("/genres")
 def get_genres(db: Session = Depends(get_db)):
