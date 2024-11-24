@@ -23,6 +23,10 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
     navigate('/dashboard/compare');
   };
 
+  const handleActors = () => {
+    navigate('/dashboard/actor-ranking');
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     navigate('/');
@@ -44,7 +48,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
             <img src={moviesIcon} alt="Movie" className="icon movies-icon" />
             <div className="label">Movies</div>
           </div>
-          <div className="panel-item" onClick={() => console.log('Actors clicked')}>
+          <div className="panel-item" onClick={handleActors}>
             <img src={actorsIcon} alt="Actor" className="icon actors-icon" />
             <div className="label">Actors</div>
           </div>

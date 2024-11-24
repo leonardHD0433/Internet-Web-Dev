@@ -9,6 +9,7 @@ import ConnectionTest from './pages/ConnectionTest'
 import DashBoard from './pages/DashboardPage'
 import MainLayout from './components/MainLayout'
 import ComparePage from './pages/ComparePage';
+import ActorRanking from './pages/ActorDashboard';
 import './App.css'
 
 function App() {
@@ -108,9 +109,9 @@ function App() {
               />
             }
           >
-            <Route index element={<DashBoard />}
-            />
+            <Route index element={<DashBoard />}/>
             <Route path="compare" element={<ComparePage />} />
+            <Route path="actor-ranking" element={<ActorRanking />} />
           </Route>
         ) : (
           <Route path="/dashboard/*" element={<Navigate to="/" replace />} />

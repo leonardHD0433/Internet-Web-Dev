@@ -14,7 +14,6 @@ const DashboardPage = () => {
       className="dashboard-select"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      defaultValue={options[0]}
     >
       {options.map(option => (
         <option key={option} value={option}>

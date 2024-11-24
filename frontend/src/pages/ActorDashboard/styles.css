@@ -1,0 +1,220 @@
+.actor-dashboard {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin-top: 200px;
+    width: 1350px;
+    margin-left: 80px;
+}
+
+.top-row{
+    position:relative;
+    display: flex;
+    height: auto; 
+    top: 0;
+    gap: 20px; 
+    width: 100%; 
+    flex-shrink: 0;
+    flex-direction: row;
+    justify-content: center; 
+    overflow: auto; 
+    align-items: center;
+    text-align: center; 
+}
+
+.mid-row{
+    margin-top: 20px;
+    position:relative;
+    display: flex;
+    top: 0;
+    gap: 20px; 
+    width: 100%; 
+    justify-content: center; 
+}
+
+.ovr-container{
+    position:relative;
+    width: 648px;
+    height: 480px;
+    top: 0px;
+    left: 10px;
+    gap: 0px;
+    flex-shrink: 0;
+
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center; 
+    border-radius: var(--Corner-Medium, 12px);
+    background: var(--Color-5, #546A7B);
+}
+
+/* best actor inner containers */
+.place-containers {
+    display: flex; 
+    gap: 20px; 
+    width: 100%; 
+    justify-content: center; 
+}
+
+.place-box-wrapper {
+    position: relative;
+    display: inline-flex; /* Use inline-flex to adapt to the size of the place-box */
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px; /* Add margin to create space between the wrappers */
+    flex: 1;
+    max-width: 30%;
+}
+
+.place-number-1,
+.place-number-2,
+.place-number-3 {
+    position: absolute;
+    top: -43px; 
+    font-size: 24px;
+    font-weight: bold;
+    color: #f5e448;
+    background: #000000;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.place-number-2 {
+    color: #ffffff;
+    top: -23px; 
+}
+
+.place-number-3 {
+    color: #946005;
+    top: -3px; 
+}
+
+.place-box {
+    background: #546A7B;
+    border-radius: var(--Corner-Medium, 12px);
+    padding: 10px;
+    color: #E9F5FE;
+    text-align: center;
+    flex: 1; 
+    width:90%;
+}
+
+.place-box-1 {
+    margin-top: 0px;
+    height: auto; /* Adjust height as needed */
+}
+
+.place-box-2 {
+    margin-top: 20px;
+    height: auto; /* Adjust height as needed */
+}
+
+.place-box-3 {
+    margin-top: 40px;
+    height: auto; /* Adjust height as needed */
+}
+
+.heatmap-box,
+.spread-box,
+.bar-box
+ {
+    position:relative;
+    width: 448px;
+    height: 280px;
+    top: 0px;
+    left: 10px;
+    gap: 0px;
+    flex-shrink: 0;
+
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: center; 
+    border-radius: var(--Corner-Medium, 12px);
+    background: var(--Color-5, #546A7B);
+}
+
+.top15-container{
+    position: absolute;
+    width: 1031px;
+    height: 237px;
+    left: 362px;
+    top: 745px;
+
+    background: #383C46;
+    border-radius: 12px;
+}
+
+
+/* Rectangle 36 */
+.top15-box{
+    position: relative;
+    width: 201px;
+    height: 201px;
+    flex-shrink: 0;
+
+    border-radius: var(--Corner-Medium, 12px);
+    background: var(--Color-5, #546A7B);
+}
+
+/* Main Genre : */
+.top15-genre{
+    position: absolute;
+    width: 68px;
+    height: 12px;
+    left: 20px;
+    top: 132px;
+
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    /* identical to box height, or 120% */
+    letter-spacing: 0.5px;
+
+    color: #E9F5FE;
+}
+
+/* Actor Name */
+.top15-name{
+    position: absolute;
+    width: 76px;
+    height: 12px;
+    left: 20px;
+    top: 140px;
+
+    font-family: 'Poppins';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 12px;
+    /* identical to box height, or 100% */
+    letter-spacing: 0.5px;
+
+    color: #E9F5FE;
+}
+
+/* Rectangle 37 */
+.top15-placeholder{
+    position: absolute;
+    width: 85px;
+    height: 100px;
+    left: 1113px;
+    top: 769px;
+
+    background: #D9D9D9;
+}
+
+
+
+
