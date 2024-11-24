@@ -96,3 +96,56 @@ def actor_ranking(db: Session = Depends(get_db)):
             } for actor in actor_popularity
         ]
     }
+
+@router.get("/genres")
+def get_genres(db: Session = Depends(get_db)):
+    genres = db.query(Genre).all()
+    return [{"genre_label": genre.genre_label} for genre in genres]
+
+@router.get("/topActorsGenres")
+def top_actors_genres(db: Session = Depends(get_db)):
+    # Get the top 5 actors with the most number of movies, excluding "Unknown" actor
+    top_actors = db.query(
+        Actor.actor_id,
+        Actor.actor_name,
+        func.count(MovieActor.movie_id).label('movie_count')
+    ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
+    ).filter(Actor.actor_id != 5
+    ).group_by(Actor.actor_id, Actor.actor_name
+    ).order_by(func.count(MovieActor.movie_id).desc()
+    ).limit(5).all()
+
+    all_genres = get_genres(db)
+    genre_labels = [genre["genre_label"] for genre in all_genres]
+
+    # Prepare the data in the required format
+    data = []
+    for actor in top_actors:
+        subquery = db.query(
+            MovieGenre.movie_id,
+            Genre.genre_label,
+            func.row_number().over(
+                partition_by=MovieGenre.movie_id,
+                order_by=Genre.genre_label
+            ).label('row_num')
+        ).join(Genre, Genre.genre_id == MovieGenre.genre_id
+        ).join(MovieActor, MovieActor.movie_id == MovieGenre.movie_id
+        ).filter(MovieActor.actor_id == actor.actor_id
+        ).subquery()
+
+        genres_count = db.query(
+            subquery.c.genre_label,
+            func.count(subquery.c.movie_id).label('count')
+        ).filter(subquery.c.row_num == 1
+        ).group_by(subquery.c.genre_label).all()
+
+        actor_data = {"x": actor.actor_name}
+        genre_count_dict = {genre.genre_label: genre.count for genre in genres_count}
+
+        # Ensure all genres are included, assign 0 if the actor has no movies in that genre
+        for genre_label in genre_labels:
+            actor_data[genre_label] = genre_count_dict.get(genre_label, 0)
+
+        data.append(actor_data)
+
+    return data

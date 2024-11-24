@@ -1,7 +1,13 @@
-
-
+//  Graph adapted and modified from: 
+//  Title: Vertical Stacked Bar Plot
+//  Author: The React Graph Gallery
+//  Date: 2024
+//  Code version: -
+//  Availability: https://www.react-graph-gallery.com/example/barplot-stacked-vertical
+ 
 import React, { useEffect, useMemo, useRef } from "react";
 import * as d3 from "d3";
+import './index.css';
 
 const MARGIN = { top: 30, right: 30, bottom: 50, left: 50 };
 
@@ -13,28 +19,25 @@ type StackedBarplotProps = {
   width: number;
   height: number;
   data: Group[];
+  allSubgroups: string[];
 };
 
 export const StackedBarplot = ({
   width,
   height,
   data,
+  allSubgroups,
 }: StackedBarplotProps) => {
-  // bounds = area inside the graph axis = calculated by substracting the margins
   const axesRef = useRef(null);
   const boundsWidth = width - MARGIN.right - MARGIN.left;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
 
   const allGroups = data.map((d) => String(d.x));
-  const allSubgroups = ["groupA", "groupB", "groupC", "groupD"]; // todo
 
-  // Data Wrangling: stack the data
   const stackSeries = d3.stack().keys(allSubgroups).order(d3.stackOrderNone);
-  //.offset(d3.stackOffsetNone);
   const series = stackSeries(data);
 
-  // Y axis
-  const max = 200; // todo
+  const max = 100; // todo
   const yScale = useMemo(() => {
     return d3
       .scaleLinear()
@@ -42,7 +45,6 @@ export const StackedBarplot = ({
       .range([boundsHeight, 0]);
   }, [data, height]);
 
-  // X axis
   const xScale = useMemo(() => {
     return d3
       .scaleBand<string>()
@@ -51,13 +53,16 @@ export const StackedBarplot = ({
       .padding(0.05);
   }, [data, width]);
 
-  // Color Scale
   var colorScale = d3
     .scaleOrdinal<string>()
     .domain(allGroups)
-    .range(["#e0ac2b", "#e85252", "#6689c6", "#9a6fb0", "#a53253"]);
+    .range([
+      "#000075", "#800000", "#9a6324", "#4363d8", "#808000",
+      "#e6194b", "#f58231", "#008080", "#3cb44b", "#808080",
+      "#46f0f0", "#bcf60c", "#ffe119", "#fabebe", "#ffd8b1",
+      "#fffac8", "#e6beff", "#f032e6", "#911eb4", "#aaffc3"
+    ]);
 
-  // Render the X and Y axis using d3.js, not react
   useEffect(() => {
     const svgElement = d3.select(axesRef.current);
     svgElement.selectAll("*").remove();
@@ -70,6 +75,37 @@ export const StackedBarplot = ({
     const yAxisGenerator = d3.axisLeft(yScale);
     svgElement.append("g").call(yAxisGenerator);
   }, [xScale, yScale, boundsHeight]);
+
+  useEffect(() => {
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+
+    const handleMouseOver = (event, d) => {
+      tooltip.style("display", "block");
+    };
+
+    const handleMouseMove = (event, d) => {
+      const subgroupName = d3.select(event.target).attr("data-subgroup");
+      const value = d3.select(event.target).attr("data-value");
+      tooltip
+        .html(`Genre: ${subgroupName}<br>Number of movies: ${value}`)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px");
+    };
+
+    const handleMouseOut = () => {
+      tooltip.style("display", "none");
+    };
+
+    d3.selectAll("rect")
+      .on("mouseover", handleMouseOver)
+      .on("mousemove", handleMouseMove)
+      .on("mouseout", handleMouseOut);
+
+    return () => {
+      tooltip.remove();
+    };
+  }, [series]);
 
   const rectangles = series.map((subgroup, i) => {
     return (
@@ -84,6 +120,8 @@ export const StackedBarplot = ({
               width={xScale.bandwidth()}
               fill={colorScale(subgroup.key)}
               opacity={0.9}
+              data-subgroup={subgroup.key}
+              data-value={group[1] - group[0]}
             ></rect>
           );
         })}
