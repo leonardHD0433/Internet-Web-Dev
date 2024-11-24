@@ -1,0 +1,73 @@
+.rating-box-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    /* background: pink; */
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.rating-box-text {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    /* background: darkblue; */
+    width: 70%;
+    height: 100%;
+    color:black;
+    margin-left: 10px;
+}
+
+.rating-box-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-right: 1rem;
+}
+
+.rating-box-description {
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.rating-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background: lightgreen; */
+    width: 30%;
+    height: 100%;
+    z-index: 2;
+}
+
+.rating-box-imdb {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background: rgb(5, 136, 5); */
+    width: 100%;
+    height: 50%;
+    z-index: 2;
+}
+
+.rating-box-popular {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background: rgb(136, 5, 81); */
+    width: 100%;
+    height: 50%;
+    z-index: 2;
+}
+
+.rating-box-label {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: black;
+}

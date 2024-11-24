@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from urllib.parse import unquote
 from database import get_db, test_db_connection
+from datetime import datetime
 from models import (
-    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre
+    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre, MovieDirector, Director
 )
 
 # Initialize router instead of app
@@ -47,10 +48,13 @@ def register(name: str, email: str, username: str, password: str, db: Session = 
     if user:
         raise HTTPException(status_code=400, detail="User already exists")
     
+    current_date = datetime.now()
+    
     new_user = Users(
         user_name=username,
         user_email=email,
-        password=password
+        password=password,
+        date_joined=current_date
     )
     
     # Add and commit to database
@@ -210,4 +214,45 @@ def no_users(db: Session = Depends(get_db)):
     ).all()
     
     result = [{"year": int(year), "count": count} for year, count in user_counts]
+    return result
+
+@router.get("/ratingMeters")
+def rating_meters(db: Session = Depends(get_db)):
+    movies = db.query(Movie).filter(
+        Movie.adult == 0,
+        Movie.status == 'Released'
+    ).order_by(Movie.release_date.desc()).limit(9).all()
+
+    #Debugging print(movies)
+
+    # Set default values for missing data
+    for movie in movies:
+        if movie.imdb_rating is None:
+            movie.imdb_rating = -1
+        if movie.popularity is None:
+            movie.popularity = -1
+
+    print("Movies after setting default values:", movies)
+
+    #sort movies by popularity and imdb rating
+    movies.sort(key=lambda x: x.imdb_rating, reverse=True)
+    movies.sort(key=lambda x: x.popularity, reverse=True)  
+
+    #Debugging print("Movies after sorting:", movies)
+
+    # Format data for frontend
+    result = []
+    for movie in movies:
+        actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie.movie_id).all()
+        directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie.movie_id).all()
+        genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie.movie_id).all()
+        result.append({
+            "title": movie.title,
+            "director": [director.director_name for director in directors],
+            "starring": [actor.actor_name for actor in actors],
+            "genre": [genre.genre_label for genre in genres],
+            "imdbRating": movie.imdb_rating,
+            "popularity": movie.popularity
+        })
+    #Debugging print(result)
     return result
