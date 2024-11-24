@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import MultilineGraph from '../../components/MultilineGraph';
 import UsersGraph from '../../components/UsersGraph';
 import RatingBox from '../../components/RatingBox';
+import WordCloud from '../../components/WordCloud';
 import './styles.css';
 
 const DashboardPage = () => {
@@ -11,6 +12,7 @@ const DashboardPage = () => {
   const [graphData, setGraphData] = useState([]);
   const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [commonGenres, setCommonGenres] = useState([]);
 
   const options = ['Language', 'Year'];
 
@@ -47,6 +49,21 @@ const DashboardPage = () => {
     };
 
     fetchMovies();
+  }, []);
+
+  useEffect(() => {
+    const fetchCommonGenres = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_COMMON_GENRES_PATH}`);
+        const data = await response.json();
+        console.log('🎬 Common genres:', data);
+        setCommonGenres(data);
+      } catch (error) {
+        console.error('Error fetching common genres:', error);
+      }
+    };
+
+    fetchCommonGenres();
   }, []);
 
   // Add Dropdown component inside DashboardPage
@@ -149,14 +166,16 @@ const DashboardPage = () => {
         </div> 
         <div className="dashboard-more-graph-container">
             <div className="dashboard-more-graph-header">
-                <div className="dashboard-more-usertitle">Users</div>
-                <div className="dashboard-more-commontitle">Common</div>
+                <div className="dashboard-more-usertitle">Number of Users</div>
+                <div className="dashboard-more-commontitle">Common Genres</div>
             </div>
             <div className="dashboard-more-graph">
                 <div className="dashboard-users-graph">
                     <UsersGraph />
                 </div>
-                <div className="dashboard-common-graph"></div>
+                <div className="dashboard-common-graph">
+                    <WordCloud data={commonGenres} />
+                </div>
             </div>
         </div>
         <div className="pad"></div>      

@@ -1,11 +1,13 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, or_
 from urllib.parse import unquote
+from typing import List, Dict
 from database import get_db, test_db_connection
 from datetime import datetime
+import re
 from models import (
-    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre, MovieDirector, Director
+    SessionLocal, Users, Actor, Movie, MovieActor, Watchlist, Genre, MovieGenre, MovieDirector, Director, Writer
 )
 
 # Initialize router instead of app
@@ -256,3 +258,163 @@ def rating_meters(db: Session = Depends(get_db)):
         })
     #Debugging print(result)
     return result
+
+@router.get("/common-genres")
+def common_genres(db: Session = Depends(get_db)):
+    # Query to get the count of each genre
+    genre_counts = db.query(
+        Genre.genre_label,
+        func.count(MovieGenre.movie_id).label('count')
+    ).join(MovieGenre, Genre.genre_id == MovieGenre.genre_id
+    ).group_by(Genre.genre_label
+    ).order_by(func.count(MovieGenre.movie_id).desc()
+    ).all()
+
+    # Format the data for the frontend
+    result = [{"genre": genre_label, "count": count} for genre_label, count in genre_counts]
+    return result
+
+@router.get("/search", response_model=List[Dict[str, str]])
+async def search(
+    query: str = Query(..., min_length=2, max_length=100),
+    db: Session = Depends(get_db)
+):
+    try:
+        # Sanitize and validate query
+        query = unquote(query).strip()
+        if not query:
+            return []
+
+        # Split query into words for better matching
+        query_words = re.findall(r'\w+', query.lower())
+        
+        # Calculate relevance score based on position of match
+        def calculate_relevance(name: str) -> float:
+            name_lower = name.lower()
+            score = 0
+            # Exact match gets highest score
+            if name_lower == query.lower():
+                return 100
+            # Starting with query gets high score
+            if name_lower.startswith(query.lower()):
+                score += 75
+            # Count matching words
+            for word in query_words:
+                if word in name_lower:
+                    score += 25
+            return score
+
+        # Search all entities with relevance scoring
+        results = []
+        
+        try:
+            # Movies search
+            movies = db.query(Movie).filter(
+                or_(
+                    Movie.title.ilike(f"%{query}%"),
+                )
+            ).limit(10).all()
+            
+            for movie in movies:
+                if movie and movie.title:  # Check if movie and title exist
+                    relevance = calculate_relevance(movie.title)
+                    results.append({
+                        "id": str(movie.movie_id),
+                        "name": movie.title,
+                        "type": "Movie",
+                        "relevance": relevance,
+                        "year": str(movie.release_year)
+                    })
+        except Exception as e:
+            print(f"Error in movie search: {str(e)}")
+
+        try:
+            # Actors search 
+            actors = db.query(Actor).filter(
+                Actor.actor_name.ilike(f"%{query}%")
+            ).limit(10).all()
+            
+            for actor in actors:
+                if actor and actor.actor_name:  # Check if actor and name exist
+                    relevance = calculate_relevance(actor.actor_name)
+                    results.append({
+                        "id": str(actor.actor_id),
+                        "name": actor.actor_name,
+                        "type": "Actor",
+                        "relevance": relevance
+                    })
+        except Exception as e:
+            print(f"Error in actor search: {str(e)}")
+
+        try:
+            # Directors search
+            directors = db.query(Director).filter(
+                Director.director_name.ilike(f"%{query}%")
+            ).limit(10).all()
+            
+            for director in directors:
+                if director and director.director_name:  # Check if director and name exist
+                    relevance = calculate_relevance(director.director_name)
+                    results.append({
+                        "id": str(director.director_id),
+                        "name": director.director_name,
+                        "type": "Director",
+                        "relevance": relevance
+                    })
+        except Exception as e:
+            print(f"Error in director search: {str(e)}")
+
+        try:
+            # Writers search
+            writers = db.query(Writer).filter(
+                Writer.writer_name.ilike(f"%{query}%")
+            ).limit(10).all()
+            
+            for writer in writers:
+                if writer and writer.writer_name:  # Check if writer and name exist
+                    relevance = calculate_relevance(writer.writer_name)
+                    results.append({
+                        "id": str(writer.writer_id),
+                        "name": writer.writer_name,
+                        "type": "Writer",
+                        "relevance": relevance
+                    })
+        except Exception as e:
+            print(f"Error in writer search: {str(e)}")
+
+        # Return empty list if no results found
+        if not results:
+            return []
+
+        # Sort by relevance and ensure diversity
+        results.sort(key=lambda x: x["relevance"], reverse=True)
+        
+        # Ensure diversity in top results (at least one of each type if available)
+        final_results = []
+        seen_types = set()
+        
+        # First pass - add highest scoring of each type
+        for result in results:
+            if result["type"] not in seen_types and len(final_results) < 5:
+                final_results.append(result)
+                seen_types.add(result["type"])
+                
+        # Second pass - fill remaining slots with highest scoring results
+        for result in results:
+            if len(final_results) >= 5:
+                break
+            if result not in final_results:
+                final_results.append(result)
+
+        # Remove relevance score from final output
+        for result in final_results:
+            result.pop("relevance", None)
+            
+        return final_results
+
+    except Exception as e:
+        print(f"Search failed: {str(e)}")  # Add logging
+        raise HTTPException(
+            status_code=500,
+            detail=f"Search failed: {str(e)}"
+        )

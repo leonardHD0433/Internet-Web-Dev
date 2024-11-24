@@ -169,7 +169,7 @@
 .dashboard-more-commontitle {
     font-weight: bold;
     font-size: 20px;
-    margin-left: 800px;
+    margin-left: 690px;
 }
 
 .dashboard-more-graph {
@@ -197,7 +197,7 @@
     align-items: center;
     width: 500px;
     height: 100%;
-    background: lightgray; /* Uncomment to see the space */
+    background: black; /* Uncomment to see the space */
     border-radius: 5px;
 }
 
