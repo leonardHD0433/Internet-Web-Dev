@@ -29,7 +29,6 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
 
     return (
         <div className="actor-dashboard">
-            <SidePanel connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />
             <div className="top-row">    
 
                 <div className="ovr-container">

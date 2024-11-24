@@ -16,15 +16,15 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
   const navigate = useNavigate();
 
   const handleHome = () => {
-    navigate('/dashboard');
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}`);
   };
 
   const handleCompare = () => {
-    navigate('/dashboard/compare');
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_COMPARE_PATH}`);
   };
 
   const handleActors = () => {
-    navigate('/dashboard/actor-ranking');
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_ACTOR_PATH}`);
   };
 
   const handleLogout = () => {

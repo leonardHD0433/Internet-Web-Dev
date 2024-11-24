@@ -112,8 +112,6 @@ def actor_ranking(db: Session = Depends(get_db)):
         else:
             actor_genres[actor.actor_id] = "No Data"
 
-        
-
     return {
         "actors": [
             {
@@ -125,3 +123,91 @@ def actor_ranking(db: Session = Depends(get_db)):
             } for actor in actor_popularity
         ]
     }
+
+@router.get("/multiline")
+def movie_stats(filterType: str, db: Session = Depends(get_db)):
+    if filterType == "Language":
+        # First get top 3 languages overall
+        top_languages = db.query(
+            Movie.original_language,
+            func.count(Movie.movie_id).label('total_count')
+        ).group_by(
+            Movie.original_language
+        ).order_by(
+            func.count(Movie.movie_id).desc()
+        ).limit(3).all()
+
+        # Format data for frontend
+        result = []
+        for lang in top_languages:
+            # Get yearly data for each top language
+            yearly_data = db.query(
+                Movie.release_year,
+                func.count(Movie.movie_id).label('count')
+            ).filter(
+                Movie.original_language == lang.original_language
+            ).group_by(
+                Movie.release_year
+            ).order_by(
+                Movie.release_year
+            ).all()
+
+            result.append({
+                "name": lang.original_language,
+                "values": [
+                    {"x": year, "y": count}
+                    for year, count in yearly_data
+                ]
+            })
+
+    else:  # Year
+        # Query for movie counts by month for last 3 years
+        years = db.query(
+            Movie.release_year
+        ).distinct().order_by(
+            Movie.release_year.desc()
+        ).limit(3)
+
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        
+        result = []
+        for year in years:
+            # Get movie counts for each month in this year
+            month_counts = dict(db.query(
+                func.date_format(Movie.release_date, '%b'),
+                func.count(Movie.movie_id)
+            ).filter(
+                Movie.release_year == year.release_year
+            ).group_by(
+                func.date_format(Movie.release_date, '%b')
+            ).all())
+            
+            # Create values list with all months, using 0 for months with no movies
+            values = [
+                {"x": month, "y": month_counts.get(month, 0)}
+                for month in months
+            ]
+            
+            result.append({
+                "name": str(year.release_year),
+                "values": values
+            })
+    return result
+
+
+@router.get("/no-users")
+def no_users(db: Session = Depends(get_db)):
+    user_counts = db.query(
+        func.extract('year', Users.date_joined).label('year'),
+        func.count(Users.user_id).label('count')
+    ).distinct(
+        func.extract('year', Users.date_joined)
+    ).group_by(
+        func.extract('year', Users.date_joined)
+    ).order_by(
+        func.extract('year', Users.date_joined)
+    ).all()
+    
+    result = [{"year": int(year), "count": count} for year, count in user_counts]
+    return result

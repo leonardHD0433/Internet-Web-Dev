@@ -4,10 +4,9 @@
     min-height: 100vh; /* Change fixed height to minimum height */
     display: flex;
     align-items: center; /* Center the content vertically */
-    flex-direction: column;
-    margin-top: 750px; /* Change margin to padding */
+    flex-direction: column; /* Change margin to padding */
     margin-left: 100px;
-    overflow-y: auto;
+    overflow-y: hidden;
     overflow-x: hidden;
     z-index: 1;
 }
@@ -17,6 +16,7 @@
     flex-direction: row;
     width: 1350px;
     justify-content: space-between;
+    margin-top: 760px;
     margin-left: 200px;
     margin-right: 200px;
     margin-bottom: 10px;
@@ -108,7 +108,7 @@
     align-items: center;
     width: 900px;
     height: 100%;
-    background: lightgray; /* Uncomment to see the space */
+    background: black; /* Uncomment to see the space */
     border-radius: 5px;
 }
 
@@ -187,7 +187,7 @@
     align-items: center;
     width: 600px;
     height: 100%;
-    background: lightgray; /* Uncomment to see the space */
+    background: black; /* Uncomment to see the space */
     border-radius: 5px;
 }
 
@@ -199,4 +199,8 @@
     height: 100%;
     background: lightgray; /* Uncomment to see the space */
     border-radius: 5px;
+}
+
+.pad {
+    padding: 20px;
 }

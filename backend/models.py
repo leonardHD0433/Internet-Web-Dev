@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Date, Text, Double, ForeignKey, create_engine, MetaData, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.sql import func
 import os
 
 # Database connection URL for MySQL
@@ -117,6 +118,7 @@ class Users(Base):
     password = Column(String(20), nullable=False)
     user_name = Column(String(100), nullable=False)
     user_email = Column(String(50), nullable=False)
+    date_joined = Column(Date, nullable=False, server_default=func.current_date())
 
 class UserSearch(Base):
     __tablename__ = "usersearch"

@@ -272,6 +272,7 @@ with engine.connect() as sql_con:
                         `password` varchar(20) NOT NULL,
                         `user_name` varchar(100) NOT NULL,
                         `user_email` varchar(50) NOT NULL,
+                        `date_joined` DATE NOT NULL,
                         PRIMARY KEY (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
@@ -323,6 +324,12 @@ print("Importing into moviegenre...")
 MovieGenre.to_sql('moviegenre', con=engine, if_exists='append', index=False)
 print("Importing into moviewriter...")
 MovieWriter.to_sql('moviewriter', con=engine, if_exists='append', index=False)
+print("Importing users data...")
+Users_df = pd.read_csv('backend/csv/Users_Dummy_Data.csv')
+Users_df['date_joined'] = pd.to_datetime(Users_df['date_joined']).dt.date
+print("Importing into users...")
+Users_df.to_sql('users', con=engine, if_exists='append', index=False)
+
 print(f"Database {database} has been initialized!")
 
 
