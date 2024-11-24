@@ -8,6 +8,10 @@ const Meter = ({ value }) => {
     }
 
     const angle = (value / 100) * 180; // Convert value to angle (0 to 180 degrees)
+    console.log("Angle: ", angle);
+
+    // Calculate stroke width based on angle
+    const strokeWidth = 10 - (Math.abs(angle - 90) / 90) * 3; // Decrease stroke width as angle approaches 90 degrees
 
     return (
         <div className="half-circle-meter-container">
@@ -28,9 +32,9 @@ const Meter = ({ value }) => {
                     className="needle"
                     x1="50"
                     y1="50"
-                    x2="50"
-                    y2="10" /* Adjusted y2 to make the needle smaller */
-                    style={{ transform: `rotate(${angle}deg)` }}
+                    x2="10"
+                    y2="50" /* Adjusted y2 to make the needle smaller */
+                    style={{ transform: `rotate(${0}deg)`, strokeWidth: strokeWidth }}
                 />
             </svg>
         </div>

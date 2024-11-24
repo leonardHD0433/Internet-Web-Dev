@@ -21,7 +21,6 @@
 .needle {
     fill: black; /* Changed needle color to black */
     stroke: black; /* Changed needle color to black */
-    stroke-width: 2; /* Adjusted stroke width */
     transform-origin: 50% 100%;
     transition: transform 0.3s ease-in-out;
 }
