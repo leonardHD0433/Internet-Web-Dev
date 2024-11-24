@@ -119,17 +119,17 @@ def preprocessing(base):
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
 
-# exporting to csv, feel free to comment if you want
-Movie.to_csv("Movie.csv", index=False)
-Director.to_csv("Director.csv", index=False)
-Writer.to_csv("Writer.csv", index=False)
-Genre.to_csv("Genre.csv", index=False)
-Actor.to_csv("Actor.csv", index=False)
+# # exporting to csv, feel free to comment if you want
+# Movie.to_csv("Movie.csv", index=False)
+# Director.to_csv("Director.csv", index=False)
+# Writer.to_csv("Writer.csv", index=False)
+# Genre.to_csv("Genre.csv", index=False)
+# Actor.to_csv("Actor.csv", index=False)
 
-MovieDirector.to_csv("MovieDirector.csv", index=False)
-MovieWriter.to_csv("MovieWriter.csv", index=False)
-MovieGenre.to_csv("MovieGenre.csv", index=False)
-MovieActor.to_csv("MovieActor.csv", index=False)
+# MovieDirector.to_csv("MovieDirector.csv", index=False)
+# MovieWriter.to_csv("MovieWriter.csv", index=False)
+# MovieGenre.to_csv("MovieGenre.csv", index=False)
+# MovieActor.to_csv("MovieActor.csv", index=False)
 
 # MySQL connection credentials
 username = os.getenv("USER")
@@ -301,6 +301,12 @@ with engine.connect() as sql_con:
                         CONSTRAINT `watchlist_ibfk_1` FOREIGN KEY (`movie_id`) REFERENCES `movie` (`movie_id`),
                         CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
+                        """))
+    
+    print("Add dummy data for testing...")
+    sql_con.execute(text("""
+                        INSERT INTO imdb_moviedb.users (password,user_name,user_email) VALUES ("password","Johnathan","Joh@gmail.com");
+                        INSERT INTO imdb_moviedb.watchlist (user_id,movie_id) VALUES (1,3692),(1,8910),(1,16498),(1,37014),(1,71679),(1,24561),(1,16718),(1,20043);
                         """))
     
     
