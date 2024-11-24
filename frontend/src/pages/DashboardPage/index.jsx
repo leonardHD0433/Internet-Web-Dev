@@ -7,7 +7,7 @@ import './styles.css';
 
 const DashboardPage = () => {
   const [loading, setLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState('Language');
+  const [selectedOption, setSelectedOption] = useState('Year');
   const [graphData, setGraphData] = useState([]);
   const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);

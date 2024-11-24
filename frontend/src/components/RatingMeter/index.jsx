@@ -2,6 +2,11 @@ import React from 'react';
 import './styles.css';
 
 const Meter = ({ value }) => {
+    console.log(value);
+    if (value ===-1|| value === undefined || value === null) {
+        return <div className="no-rating">No Available Rating</div>;
+    }
+
     const angle = (value / 100) * 180; // Convert value to angle (0 to 180 degrees)
 
     return (

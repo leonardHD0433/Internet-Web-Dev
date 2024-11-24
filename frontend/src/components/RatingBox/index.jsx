@@ -4,13 +4,16 @@ import TextLooper from '../ChangingWords';
 import './styles.css';
 
 const RatingBox = ({ title, director, starring, genre, imdbRating, popularity }) => {
-
     const renderTextLooper = (texts) => {
         console.log(texts);
         if (Array.isArray(texts)) {
+            if (texts[0] === "Unknown") {
+                return "-";
+            }
             return texts.length > 1 ? <TextLooper texts={texts} /> : texts[0];
         }
-        return texts;
+    
+        return texts === "Unknown" ? "-" : texts; // Return texts directly
     };
 
     return (
@@ -19,9 +22,9 @@ const RatingBox = ({ title, director, starring, genre, imdbRating, popularity })
                 
                 <div className="rating-box-title">{title}</div>
                 <div className="rating-box-description">
-                    Directed by: {renderTextLooper(director)}<br />
-                    Starring: {renderTextLooper(starring)}<br />
-                    Genre: {renderTextLooper(genre)}<br />
+                    Directed by: <span className = "renderedTxt">{renderTextLooper(director)}</span><br />
+                    Starring: <span className = "renderedTxt">{renderTextLooper(starring)}</span><br />
+                    Genre: <span className = "renderedTxt">{renderTextLooper(genre)}</span><br />
                 </div>
             </div>
             <div className="rating-box">
