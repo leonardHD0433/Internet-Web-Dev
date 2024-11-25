@@ -69,7 +69,8 @@ const ComparePage = () => {
         starring: data.actors,
         genre: data.genres,
         imdbRating: data.imdb_rating,
-        popularity: data.popularity
+        popularity: data.popularity,
+        date_released : data.date_released
       };
       
       if (activeButton === 'left') {
@@ -95,7 +96,16 @@ return (
       <div className="compare-space">
         <div className="compare-content">
           {leftMovie ? (
-            <RatingBox {...leftMovie} />
+            <div className="movie-selection">
+              <RatingBox {...leftMovie} />
+              <button
+                  className="change-movie-button"
+                  onClick={() => handleAddMovie('left')}
+                  aria-label="Change first movie"
+                >
+                  Change Movie
+              </button>
+            </div>
           ) : (
             <button 
               className="add-movie-button"
@@ -108,7 +118,16 @@ return (
         </div>
         <div className="compare-content">
           {rightMovie ? (
-            <RatingBox {...rightMovie} />
+            <div className="movie-selection">
+              <RatingBox {...rightMovie} />
+              <button
+                className="change-movie-button"
+                onClick={() => handleAddMovie('right')}
+                aria-label="Change second movie"
+              >
+                Change Movie
+              </button>
+            </div>
           ) : (
             <button 
               className="add-movie-button"

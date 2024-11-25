@@ -40,10 +40,10 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background-color: #667A8A;
+    width: 100%;
+    height: 100%;
+    border-radius: 5%;
+    background-color: transparent;
     border: none;
     color: white;
     font-size: 32px;
@@ -54,22 +54,23 @@
     transition: background-color 0.3s ease;
 }
 
-.add-movie-button:hover {
-    background-color: #546A7B;
+.plus-icon:hover {
+    color: #546A7B;
 }
 
-.add-movie-button:focus {
+.plus-icon:focus {
     outline: none;
 }
 
 .plus-icon {
-    font-size: 36px;
+    font-size: 500px;
     font-weight: bold;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 7px;
+    margin-bottom: 130px;
+    color: #667A8A;
 }
 
 .compare-graph {
@@ -104,4 +105,33 @@
 
 .MuiListItem-root:hover {
     background-color: rgba(0, 0, 0, 0.04);
+}
+
+.rating-box-text {
+    margin-top: 15px;
+}
+
+/* styles.css in src/pages/ComparePage */
+
+.movie-selection {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.change-movie-button {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background-color: #667A8A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 3;
+}
+
+.change-movie-button:hover {
+    background-color: #546A7B;
 }

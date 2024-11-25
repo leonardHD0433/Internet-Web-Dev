@@ -23,12 +23,22 @@
     margin-left: 10px;
 }
 
+@keyframes titleGlow {
+    0% { text-shadow: 0 0 5px rgba(138, 43, 226, 0.3); }
+    50% { text-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
+    100% { text-shadow: 0 0 5px rgba(138, 43, 226, 0.3); }
+}
+
 .rating-box-title {
     font-size: 1.3rem;
     font-weight: bold;
     margin-right: 1rem;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
+    color: blueviolet;
+    text-shadow: 0 0 5px rgba(138, 43, 226, 0.3);
+    animation: titleGlow 2s ease-in-out infinite;
 }
+
 
 .rating-box-description {
     font-size: 1rem;
@@ -77,4 +87,8 @@
 
 .renderedTxt{
     font-weight: bold;
+}
+
+.no-rating + .rating-box-label {
+    opacity: 0;
 }

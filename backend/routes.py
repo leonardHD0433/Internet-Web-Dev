@@ -65,6 +65,18 @@ def register(name: str, email: str, username: str, password: str, db: Session = 
     db.refresh(new_user)
     return {"success": True}
 
+def get_good_movie_data(db: Session):
+    movies = db.query(Movie).filter(
+        Movie.adult == 0,
+        Movie.status == 'Released',
+        Movie.imdb_rating > 5,
+        Movie.popularity > 5
+    ).order_by(
+        (Movie.imdb_rating + Movie.popularity).desc()
+    ).all()
+        
+    return movies
+
 @router.get("/actorRanking")
 def actor_ranking(db: Session = Depends(get_db)):
     # Select the top 3 actors based on the average value of average popularity and average IMDb rating
@@ -222,7 +234,9 @@ def no_users(db: Session = Depends(get_db)):
 def rating_meters(db: Session = Depends(get_db)):
     movies = db.query(Movie).filter(
         Movie.adult == 0,
-        Movie.status == 'Released'
+        Movie.status == 'Released',
+        Movie.imdb_rating > 5,
+        Movie.popularity > 5
     ).order_by(Movie.release_date.desc()).limit(9).all()
 
     #Debugging print(movies)
@@ -248,13 +262,15 @@ def rating_meters(db: Session = Depends(get_db)):
         actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie.movie_id).all()
         directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie.movie_id).all()
         genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie.movie_id).all()
+        released_date = movie.release_date.strftime("%d-%m-%Y")
         result.append({
             "title": movie.title,
             "director": [director.director_name for director in directors],
             "starring": [actor.actor_name for actor in actors],
             "genre": [genre.genre_label for genre in genres],
             "imdbRating": movie.imdb_rating,
-            "popularity": movie.popularity
+            "popularity": movie.popularity,
+            "date_released": released_date
         })
     #Debugging print(result)
     return result
@@ -493,6 +509,7 @@ def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie_id).all()
     writers = db.query(Writer).join(MovieWriter).filter(MovieWriter.movie_id == movie_id).all()
     genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie_id).all()
+    date_released = movie.release_date.strftime("%d-%m-%Y")
 
     return {
         "title": movie.title,
@@ -503,5 +520,6 @@ def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
         "actors": [actor.actor_name for actor in actors],
         "directors": [director.director_name for director in directors],
         "writers": [writer.writer_name for writer in writers],
-        "genres": [genre.genre_label for genre in genres]
+        "genres": [genre.genre_label for genre in genres],
+        "date_released": date_released
     }

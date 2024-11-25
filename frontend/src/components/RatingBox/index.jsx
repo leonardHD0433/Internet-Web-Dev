@@ -3,7 +3,7 @@ import Meter from '../../components/RatingMeter';
 import TextLooper from '../ChangingWords';
 import './styles.css';
 
-const RatingBox = ({ title, director, starring, genre, imdbRating, popularity }) => {
+const RatingBox = ({ title, director, starring, genre, imdbRating, popularity, date_released }) => {
     const renderTextLooper = (texts) => {
         console.log(texts);
         if (Array.isArray(texts)) {
@@ -18,13 +18,13 @@ const RatingBox = ({ title, director, starring, genre, imdbRating, popularity })
 
     return (
         <div className="rating-box-container">
-            <div className="rating-box-text">
-                
+            <div className="rating-box-text">           
                 <div className="rating-box-title">{title}</div>
                 <div className="rating-box-description">
                     Directed by: <span className = "renderedTxt">{renderTextLooper(director)}</span><br />
                     Starring: <span className = "renderedTxt">{renderTextLooper(starring)}</span><br />
                     Genre: <span className = "renderedTxt">{renderTextLooper(genre)}</span><br />
+                    Data Released: <span className = "renderedTxt">{date_released}</span><br />
                 </div>
             </div>
             <div className="rating-box">

@@ -103,7 +103,8 @@ const DashboardPage = () => {
         starring: movies[index].starring,
         genre: movies[index].genre,
         imdbRating: movies[index].imdbRating,
-        popularity: movies[index].popularity
+        popularity: movies[index].popularity,
+        date_released: movies[index].date_released
       };
     }
     return {};
