@@ -106,7 +106,7 @@ def get_genres(db: Session = Depends(get_db)):
     genres = db.query(Genre).all()
     return [{"genre_label": genre.genre_label} for genre in genres]
 
-@router.get("/topActorsGenres")
+@router.get("/MostProlificActors")
 def top_actors_genres(db: Session = Depends(get_db)):
     # Get the top 5 actors with the most number of movies, excluding "Unknown" actor
     top_actors = db.query(

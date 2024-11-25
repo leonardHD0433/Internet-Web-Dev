@@ -5,7 +5,7 @@
 //  Code version: -
 //  Availability: https://www.react-graph-gallery.com/example/barplot-stacked-vertical
  
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 import './index.css';
 
@@ -20,6 +20,8 @@ type StackedBarplotProps = {
   height: number;
   data: Group[];
   allSubgroups: string[];
+  yLabel: string;
+  xLabel: string;
 };
 
 export const StackedBarplot = ({
@@ -27,7 +29,10 @@ export const StackedBarplot = ({
   height,
   data,
   allSubgroups,
+  yLabel,
+  xLabel,
 }: StackedBarplotProps) => {
+  const [selectedGenres, setSelectedGenres] = useState<string[]>(allSubgroups);
   const axesRef = useRef(null);
   const boundsWidth = width - MARGIN.right - MARGIN.left;
   const boundsHeight = height - MARGIN.top - MARGIN.bottom;
@@ -63,7 +68,7 @@ export const StackedBarplot = ({
 
   var colorScale = d3
     .scaleOrdinal<string>()
-    .domain(allGroups)
+    .domain(allSubgroups)
     .range([
       "#000075", "#800000", "#9a6324", "#4363d8", "#808000",
       "#e6194b", "#f58231", "#008080", "#3cb44b", "#808080",
@@ -78,11 +83,35 @@ export const StackedBarplot = ({
     svgElement
       .append("g")
       .attr("transform", "translate(0," + boundsHeight + ")")
-      .call(xAxisGenerator);
+      .call(xAxisGenerator)
+      .selectAll("text")
+      .style("font-size", "14px");
 
     const yAxisGenerator = d3.axisLeft(yScale);
-    svgElement.append("g").call(yAxisGenerator);
-  }, [xScale, yScale, boundsHeight]);
+    svgElement.append("g")
+      .call(yAxisGenerator)
+      .selectAll("text")
+      .style("font-size", "14px");
+
+    // Add x-axis label
+    svgElement.append("text")
+      .attr("transform", `translate(${boundsWidth / 2}, ${boundsHeight + MARGIN.bottom - 10})`)
+      .style("text-anchor", "middle")
+      .style("font-size", "16px")
+      .style("fill", "white")
+      .text(xLabel);
+
+    // Add y-axis label
+    svgElement.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - MARGIN.left + 20)
+      .attr("x", 0 - (boundsHeight / 2))
+      .attr("dy", "-0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "18px")
+      .style("fill", "white")
+      .text(yLabel);
+  }, [xScale, yScale, boundsHeight, boundsWidth]);
 
   useEffect(() => {
     const tooltip = d3.select("body").append("div")
@@ -119,6 +148,7 @@ export const StackedBarplot = ({
     return (
       <g key={i}>
         {subgroup.map((group, j) => {
+          const isSelected = selectedGenres.includes(subgroup.key);
           return (
             <rect
               key={j}
@@ -126,7 +156,7 @@ export const StackedBarplot = ({
               y={yScale(group[1])}
               height={yScale(group[0]) - yScale(group[1])}
               width={xScale.bandwidth()}
-              fill={colorScale(subgroup.key)}
+              fill={isSelected ? colorScale(subgroup.key) : "grey"}
               opacity={0.9}
               data-subgroup={subgroup.key}
               data-value={group[1] - group[0]}
@@ -137,23 +167,62 @@ export const StackedBarplot = ({
     );
   });
 
+  const handleGenreChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const genre = event.target.value;
+    setSelectedGenres((prevSelectedGenres) =>
+      prevSelectedGenres.includes(genre)
+        ? prevSelectedGenres.filter((g) => g !== genre)
+        : [...prevSelectedGenres, genre]
+    );
+  };
+
+  const selectAll = () => {
+    setSelectedGenres(allSubgroups);
+  };
+
+  const deselectAll = () => {
+    setSelectedGenres([]);
+  };
+
   return (
-    <div>
-      <svg width={width} height={height}>
-        <g
-          width={boundsWidth}
-          height={boundsHeight}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
-        >
-          {rectangles}
-        </g>
-        <g
-          width={boundsWidth}
-          height={boundsHeight}
-          ref={axesRef}
-          transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
-        />
-      </svg>
+    <div className="main-container">
+      <div className="control-panel">
+        <div className="button-container">
+          <button onClick={selectAll}>Select All</button>
+          <button onClick={deselectAll}>Deselect All</button>   
+        </div>   
+        <div className="checkbox-container">
+
+          {allSubgroups.map((subgroup) => (
+            <div key={subgroup} className="checkbox-item">
+              <input
+                type="checkbox"
+                value={subgroup}
+                checked={selectedGenres.includes(subgroup)}
+                onChange={handleGenreChange}
+              />
+              <label>{subgroup}</label>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <svg width={width} height={height}>
+          <g
+            width={boundsWidth}
+            height={boundsHeight}
+            transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
+          >
+            {rectangles}
+          </g>
+          <g
+            width={boundsWidth}
+            height={boundsHeight}
+            ref={axesRef}
+            transform={`translate(${[MARGIN.left, MARGIN.top].join(",")})`}
+          />
+        </svg>
+      </div>
     </div>
   );
 };

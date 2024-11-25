@@ -4,20 +4,42 @@
     padding: 20px;
 }
 
+.title {
+    margin-bottom: 20px; /* Add margin to ensure the title is not cut off */
+}
+
+.scale-content {
+    transform: scale(0.8); /* Adjust the scale value as needed */
+    transform-origin: top center;
+}
+
 .top-row{
     position:relative;
     display: flex;
     height: auto; 
-    top: 0;
-    gap: 20px; 
     width: 100%; 
     flex-shrink: 0;
+    margin-top: 250px;
 
     flex-direction: row;
     justify-content: center; 
     overflow: auto; 
     align-items: center;
     text-align: center; 
+    padding: 2px;
+}
+
+.bar-container{
+    position:relative;
+    display: flex;
+    width: 100%; 
+
+    justify-content: center; 
+    align-items: center;
+    text-align: center; 
+    flex-direction: column;
+    border-radius: var(--Corner-Medium, 12px);
+    background: var(--Color-5, #546A7B);
 }
 
 .mid-row{
@@ -28,6 +50,8 @@
     gap: 20px; 
     width: 100%; 
     justify-content: center; 
+    align-items: center;
+    text-align: center; 
 }
 
 .ovr-container{
@@ -91,7 +115,7 @@
 
 .place-number-3 {
     color: #946005;
-    top: 3px; 
+    top: 17px; 
 }
 
 .place-box {
@@ -131,13 +155,13 @@
     height: auto; /* Adjust height as needed */
 }
 
-.heatmap-box,
-.spread-box,
-.bar-box
+.density-box,
+.actor-rank-box,
+.watchlist-box
  {
     position:relative;
-    width: 448px;
-    height: 280px;
+    width: 548px;
+    height: 380px;
     top: 0px;
     left: 10px;
     gap: 0px;
