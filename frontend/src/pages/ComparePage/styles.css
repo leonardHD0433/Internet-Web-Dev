@@ -1,12 +1,12 @@
 .compare-container {
-    position: fixed;
+    position: relative;
     width: 100%; /* Ensure the container takes the full width */
-    height: 100%; /* Ensure the container takes the full height */
+    min-height: 100vh; /* Ensure the container takes the full height */
     display: flex;
     align-items: center; /* Center the content vertically */
     flex-direction: column;
     margin-top: 200px;
-    margin-left: 100px;
+    margin-left: 110px;
 }
 
 .compare-space {
@@ -129,9 +129,28 @@
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    z-index: 3;
+    z-index: 2;
 }
 
 .change-movie-button:hover {
     background-color: #546A7B;
+}
+
+.compare-graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1000px;
+    height: 400px; /* Adjusted height */
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    background-color: #f5f5f5; /* Optional background color */
+}
+
+.compare-graph-comment {
+    width: 700px;
+    font-size: 25px;
+    color: black;
+    background-color: transparent;
 }

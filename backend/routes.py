@@ -512,6 +512,7 @@ def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
     date_released = movie.release_date.strftime("%d-%m-%Y")
 
     return {
+        "id": movie.movie_id,
         "title": movie.title,
         "overview": movie.overview,
         "release_date": movie.release_date,

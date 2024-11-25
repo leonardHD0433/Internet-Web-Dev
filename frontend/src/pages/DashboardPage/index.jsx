@@ -40,7 +40,12 @@ const DashboardPage = () => {
         const response = await fetch(`${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_RATING_PATH}`);
         const data = await response.json();
         console.log('🎬 Movies:', data);
-        setMovies(data);
+        const sortedMovies = [...data].sort((a, b) => {
+          const dateA = new Date(a.date_released.split('-').reverse().join('-'));
+          const dateB = new Date(b.date_released.split('-').reverse().join('-'));
+          return dateB - dateA; // Most recent first
+        });
+        setMovies(sortedMovies);
       } catch (error) {
         console.error('Error fetching movies:', error);
       } finally {
@@ -167,8 +172,8 @@ const DashboardPage = () => {
         </div> 
         <div className="dashboard-more-graph-container">
             <div className="dashboard-more-graph-header">
-                <div className="dashboard-more-usertitle">Number of Users</div>
-                <div className="dashboard-more-commontitle">Common Genres</div>
+                <div className="dashboard-more-usertitle">Number of Users on the Platform</div>
+                <div className="dashboard-more-commontitle">Most Common Movie Genres</div>
             </div>
             <div className="dashboard-more-graph">
                 <div className="dashboard-users-graph">
