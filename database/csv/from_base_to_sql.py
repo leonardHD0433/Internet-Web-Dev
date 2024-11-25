@@ -4,7 +4,6 @@ import re
 import sqlalchemy
 from sqlalchemy import create_engine, text
 import os
-from dotenv import load_dotenv
 base_df = pd.read_csv("database\csv\IMDb_Dataset_Edited.csv")
 
 # function for adding new index col for actor, director, genre, writer, reordering id col to left
@@ -41,11 +40,12 @@ def preprocessing(base):
     # Dropping all columns with significant (>50%) amount of null values (with the exception of IMDB rating)
     base.drop(columns=["imdb_id","tagline","production_companies","production_countries","spoken_languages","AverageRating","Poster_Link","Certificate","Meta_score","Star1","Star2","Star3","Star4","Director_of_Photography","Producers","Music_Composer"], inplace=True)
 
-    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating values with 0
+    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating values with -1
+    base.fillna({"budget":0}, inplace=True) # fill missing budget values with 0
     base.fillna("Missing",inplace=True) # Filling all remaining null values with "Missing"
 
     base.drop_duplicates(inplace=True) # dropping duplicates while considering all columns
-    base.drop(columns=["vote_average","vote_count","revenue","budget", "keywords","overview_sentiment", "original_title", "all_combined_keywords"], inplace=True) # dropping numerical columns with significant amount of 0 values + keywords, overview_sentiment, original_title because it is unnecessary for this assignment
+    base.drop(columns=["vote_average","vote_count","revenue","keywords","overview_sentiment", "original_title", "all_combined_keywords"], inplace=True) # dropping numerical columns with significant amount of 0 values + keywords, overview_sentiment, original_title because it is unnecessary for this assignment
 
     # Convert string to list with , delimiter
     base['Director'] = base['Director'].apply(lambda x: x.split(', '))
@@ -77,7 +77,8 @@ def preprocessing(base):
     # making new id one, reordering cols
     # base.drop(columns=["id"], inplace=True)
     base["movie_id"] = range(1, len(base) + 1)
-    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9,11]]
+    base = base.iloc[:,[0,16,1,2,3,4,5,6,7,8,9,10,12]]
+    print(base.columns)
 
     actors.columns = ["actor_id","actor_name"]
     director.columns = ["director_id","director_name"]
@@ -89,7 +90,8 @@ def preprocessing(base):
     MovieGenre = match_ids(base, MovieGenre, genres, genres.columns[0], genres.columns[1])
     MovieWriter = match_ids(base, MovieWriter, writer, writer.columns[0], writer.columns[1])
 
-    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11]] # reordering to remove old id col
+    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11,12]] # reordering to remove old id col
+    print(base.columns)
 
     # removing non-ascii chars
     base = base.map(remove_non_ascii)
@@ -113,23 +115,12 @@ def preprocessing(base):
     initial_pop_max = base.popularity.max()
     initial_imdb_max = base["IMDB_Rating"].max()
     base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
-    base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
+    #base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
 
-# # exporting to csv, feel free to comment if you want
-# Movie.to_csv("Movie.csv", index=False)
-# Director.to_csv("Director.csv", index=False)
-# Writer.to_csv("Writer.csv", index=False)
-# Genre.to_csv("Genre.csv", index=False)
-# Actor.to_csv("Actor.csv", index=False)
-
-# MovieDirector.to_csv("MovieDirector.csv", index=False)
-# MovieWriter.to_csv("MovieWriter.csv", index=False)
-# MovieGenre.to_csv("MovieGenre.csv", index=False)
-# MovieActor.to_csv("MovieActor.csv", index=False)
 
 # MySQL connection credentials
 username = os.getenv("USER")
@@ -140,6 +131,7 @@ database = os.getenv("DATABASE")
 # Create a MySQL connection engine using SQLAlchemy
 # NOTES: MUST INCREASE MAX_PACKET_SIZE to 50M in bin config
 engine = create_engine(f"mysql+mysqlconnector://{username}:{password}@{host}/{database}")
+
 # create tables and set PKs, SKs
 with engine.connect() as sql_con:
     # Dropping tables from db, if exists used to prevent errors if table does not exist, before re-creating, foreign key check needs to be disabled to allow tables to drop properly
@@ -164,6 +156,7 @@ with engine.connect() as sql_con:
                         `release_date` date DEFAULT NULL,
                         `runtime` int(20) DEFAULT NULL,
                         `adult` bool DEFAULT NULL,
+                        `budget` int(20) DEFAULT NULL,
                         `original_language` varchar(20) DEFAULT NULL,
                         `overview` text DEFAULT NULL,
                         `popularity` double DEFAULT NULL,
@@ -272,7 +265,7 @@ with engine.connect() as sql_con:
                         `user_id` int(20) NOT NULL AUTO_INCREMENT,
                         `password` varchar(20) NOT NULL,
                         `user_name` varchar(100) NOT NULL,
-                        `user_email` varchar(50) NOT NULL,
+                        `user_email` varchar(100) NOT NULL,
                         PRIMARY KEY (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
@@ -303,11 +296,13 @@ with engine.connect() as sql_con:
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
     
+    # Add dummy data for testing
     print("Add dummy data for testing...")
     sql_con.execute(text("""
                         INSERT INTO imdb_moviedb.users (password,user_name,user_email) VALUES ("password","Johnathan","Joh@gmail.com");
                         INSERT INTO imdb_moviedb.watchlist (user_id,movie_id) VALUES (1,3692),(1,8910),(1,16498),(1,37014),(1,71679),(1,24561),(1,16718),(1,20043);
                         """))
+    
     
     
 # import dfs into SQL tables
@@ -331,7 +326,3 @@ MovieGenre.to_sql('moviegenre', con=engine, if_exists='append', index=False)
 print("Importing into moviewriter...")
 MovieWriter.to_sql('moviewriter', con=engine, if_exists='append', index=False)
 print(f"Database {database} has been initialized!")
-
-
-
-
