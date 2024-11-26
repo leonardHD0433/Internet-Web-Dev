@@ -7,9 +7,11 @@ import CreateAccountButton from './components/CreateAccountButton'
 import CreateAccountPage from './pages/CreateAccountPage'
 import ConnectionTest from './pages/ConnectionTest'
 import MainLayout from './components/MainLayout'
+import ActorRanking from './pages/ActorDashboard'
+import AboutUs from './pages/AboutUs';
 import './App.css'
 import './styles/index.css'
-import ActorRanking from './pages/ActorDashboard'
+
 
 function App() {
   const [showTest, setShowTest] = useState(false)
@@ -92,6 +94,7 @@ function App() {
           )
         } />
 
+<Route path="/about-us" element={<AboutUs connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/actor-ranking" element={<ActorRanking connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />} />
       </Routes>
