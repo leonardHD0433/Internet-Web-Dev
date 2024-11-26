@@ -107,7 +107,7 @@ def get_genres(db: Session = Depends(get_db)):
     return [{"genre_label": genre.genre_label} for genre in genres]
 
 @router.get("/MostProlificActors")
-def top_actors_genres(db: Session = Depends(get_db)):
+def top_prolific_actors(db: Session = Depends(get_db)):
     # Get the top 5 actors with the most number of movies, excluding "Unknown" actor
     top_actors = db.query(
         Actor.actor_id,
@@ -153,3 +153,62 @@ def top_actors_genres(db: Session = Depends(get_db)):
         data.append(actor_data)
 
     return data
+
+
+@router.get("/ActorByGenre")
+def top_actors_genres(genre: str, year: str, db: Session = Depends(get_db)):
+    # Get the top 15 actors with the most number of movies in the selected genre and year
+    query = db.query(
+        Actor.actor_id,
+        Actor.actor_name,
+        func.count(MovieActor.movie_id).label('movie_count'),
+        func.avg(func.nullif(Movie.budget, 0)).label('average_budget'),
+        func.avg(func.nullif(Movie.imdb_rating, -1)).label('average_imdb_rating'),
+        func.avg(func.nullif(Movie.popularity, 0)).label('average_popularity')
+    ).join(MovieActor, Actor.actor_id == MovieActor.actor_id
+    ).join(MovieGenre, MovieActor.movie_id == MovieGenre.movie_id
+    ).join(Genre, MovieGenre.genre_id == Genre.genre_id
+    ).join(Movie, MovieActor.movie_id == Movie.movie_id
+    ).filter(Actor.actor_id != 5)
+
+    if genre != "All Genres":
+        query = query.filter(Genre.genre_label == genre)
+    if year != "All Years":
+        query = query.filter(Movie.release_year == int(year))
+
+    top_actors = query.group_by(Actor.actor_id, Actor.actor_name
+    ).order_by(func.count(MovieActor.movie_id).desc()
+    ).limit(15).all()
+
+    # Find the most common genre for the actors
+    actor_genres = {}
+    for actor in top_actors:
+        common_genre = db.query(
+            Genre.genre_label,
+            func.count(Genre.genre_label).label('genre_count')
+        ).join(MovieGenre, Genre.genre_id == MovieGenre.genre_id
+        ).join(Movie, MovieGenre.movie_id == Movie.movie_id
+        ).join(MovieActor, Movie.movie_id == MovieActor.movie_id
+        ).filter(MovieActor.actor_id == actor.actor_id
+        ).group_by(Genre.genre_label
+        ).order_by(func.count(Genre.genre_label).desc()
+        ).first()
+        
+        actor_genres[actor.actor_id] = common_genre.genre_label if common_genre and common_genre.genre_label != "Unknown" else "No Data"
+
+    # Create a list of dictionaries with the required data
+    actors_data = []
+    for actor in top_actors:
+        actor_data = {
+            "actor_name": actor.actor_name,
+            "movie_count": actor.movie_count,
+            "average_budget": int(actor.average_budget) if actor.average_budget else "No Data",
+            "most_common_genre": actor_genres[actor.actor_id],
+            "average_imdb_rating": round(actor.average_imdb_rating, 2) if actor.average_imdb_rating else 0,
+            "average_popularity": round(actor.average_popularity, 2) if actor.average_popularity else 0
+        }
+        actors_data.append(actor_data)
+            
+    return {
+        "actors": actors_data
+    }

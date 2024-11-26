@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import SidePanel from '../../components/SidePanel';
 import { StackedBarplot } from '../../components/StackedBarPlot/';
+import RatingBox from '../../components/RatingBoxActor';
 import './styles.css';
 
 function ActorRanking({ connectionStatus, handleStatusClick }) { 
@@ -9,6 +10,12 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
     const [isLoadingProlific, setIsLoadingProlific] = useState(true);
     const [barplotData, setBarplotData] = useState([]);
     const [genres, setGenres] = useState([]);
+    const [selectedGenre, setSelectedGenre] = useState('All Genres'); 
+    const [selectedYear, setSelectedYear] = useState("All Years"); 
+    const [topActors, setTopActors] = useState([]);
+    const [isLoadingTopActors, setIsLoadingTopActors] = useState(true);
+
+    const scrollContainerRef = useRef(null);
 
     useEffect(() => {
         const fetchActors = async () => {
@@ -28,7 +35,6 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
         };
         fetchActors();
     }, []);
-
 
     useEffect(() => {
         const fetchBarPlotData = async () => {
@@ -53,6 +59,39 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
         fetchBarPlotData();
     }, []);
 
+    useEffect(() => {
+        setIsLoadingTopActors(true);
+        const fetchTopActors = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/ActorByGenre?genre=${selectedGenre}&year=${selectedYear}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const topActorsData = await response.json();
+                setTopActors(topActorsData.actors);
+            } catch (error) {
+                console.error('Error fetching top actors by genre:', error);
+            } finally {
+                setIsLoadingTopActors(false);
+            }
+        };
+        fetchTopActors();
+    }, [selectedGenre, selectedYear]);
+
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+        }
+    };
+
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+        }
+    };
+
+    const currentYear = new Date().getFullYear();
+    const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
 
     return (
         <div className="actor-dashboard">
@@ -161,6 +200,44 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
                         )}
                     </div>
                 </div>
+            </div>
+            <div className="bottom-row">
+                <h3>Top Actors by Genre and Year</h3>
+                <div className="dropdown-container">
+                    <select value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
+                        <option value="All Genres">All Genres</option>
+                        {genres.map((genre) => (
+                            <option key={genre} value={genre}>{genre}</option>
+                        ))}
+                    </select>
+                    <select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
+                        <option value="All Years">All Years</option>
+                        {years.map((year) => (
+                            <option key={year} value={year}>{year}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="scroll-buttons">
+                    <button onClick={scrollLeft}>&lt;</button>
+                    <button onClick={scrollRight}>&gt;</button>
+                </div>
+                {isLoadingTopActors ? (
+                    <p>Fetching Data...</p>
+                ) : (
+                    <div className="top-actors-container" ref={scrollContainerRef}>
+                        {topActors.map((actor) => (
+                            <RatingBox
+                                key={actor.actor_id}
+                                name={actor.actor_name}
+                                movie_count={actor.movie_count}
+                                budget={actor.average_budget}
+                                genre={actor.most_common_genre}
+                                imdbRating={actor.average_imdb_rating}
+                                popularity={actor.average_popularity}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -43,6 +43,7 @@ class Movie(Base):
     runtime = Column(Integer, nullable=True)
     adult = Column(Boolean, nullable=True)
     original_language = Column(String(20), nullable=True)
+    budget = Column(Integer, nullable=True)
     overview = Column(Text, nullable=True)
     popularity = Column(Double, nullable=True)
     release_year = Column(Integer, nullable=True)
