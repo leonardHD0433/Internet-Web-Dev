@@ -1,3 +1,11 @@
+.nav-box {
+    z-index: 3;
+}
+
+.side-panel {
+    z-index: 4;
+}
+
 .compare-container {
     position: relative;
     width: 100%; /* Ensure the container takes the full width */
@@ -5,7 +13,6 @@
     display: flex;
     align-items: center; /* Center the content vertically */
     flex-direction: column;
-    margin-top: 200px;
     margin-left: 110px;
 }
 
@@ -140,17 +147,33 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 1000px;
+    width: 900px;
     height: 400px; /* Adjusted height */
     border-radius: 20px;
     margin-left: 50px;
     margin-right: 50px;
     background-color: #f5f5f5; /* Optional background color */
+    font-size: 30px;
+    color: black; /* Optional text color */
 }
 
 .compare-graph-comment {
     width: 700px;
     font-size: 25px;
-    color: black;
+    color: white;
     background-color: transparent;
+}
+
+.compare-graph-section {
+    display: flex;
+}
+
+.metrics-checkboxes {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+.metrics-checkboxes div {
+    margin-bottom: 5px;
 }

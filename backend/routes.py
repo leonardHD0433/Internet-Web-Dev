@@ -524,3 +524,31 @@ def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
         "genres": [genre.genre_label for genre in genres],
         "date_released": date_released
     }
+
+@router.get("/search-movie-graph/{movie_id}")
+def search_movie_graph(movie_id: int, db: Session = Depends(get_db)):
+    movie = db.query(Movie).filter(Movie.movie_id == movie_id).first()
+    if not movie:
+        raise HTTPException(
+            status_code=404,
+            detail="Movie not found"
+        )
+
+    # Get actors, directors, writers and genres for the movie
+    actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie_id).all()
+    directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie_id).all()
+    writers = db.query(Writer).join(MovieWriter).filter(MovieWriter.movie_id == movie_id).all()
+    genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie_id).all()
+    runtime = movie.runtime
+
+    return {
+        "id": movie.movie_id,
+        "title": movie.title,
+        "popularity": movie.popularity,
+        "imdb_rating": movie.imdb_rating,
+        "actors": [actor.actor_name for actor in actors],
+        "directors": [director.director_name for director in directors],
+        "writers": [writer.writer_name for writer in writers],
+        "genres": [genre.genre_label for genre in genres],
+        "runtime":  runtime
+    }
