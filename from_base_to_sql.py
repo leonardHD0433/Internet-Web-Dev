@@ -112,9 +112,12 @@ def preprocessing(base):
 
     # Mapping the range of popularity values/IMDB ratings to a range of 0-100
     initial_pop_max = base.popularity.max()
-    initial_imdb_max = base["IMDB_Rating"].max()
+    #initial_imdb_max = base["IMDB_Rating"].max()
     base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
     #base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
+
+    # turning values above 0.07 to 0 for popularity col
+    base.popularity = base.popularity.apply(lambda x: 0 if x > 0.07 else x)
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
@@ -149,7 +152,7 @@ with engine.connect() as sql_con:
     sql_con.execute(text("""
                         SET FOREIGN_KEY_CHECKS = 0;
                         """))
-    sql_con.execute(text("""
+    sql_con.execute(text("""s
                          DROP TABLE IF EXISTS `actor`, `director`, `genre`, `movie`, `movieactor`, `moviedirector`, `moviegenre`, `moviewriter`, `writer`,`users`,`usersearch`,`watchlist`;
                          """))
     sql_con.execute(text("""
