@@ -40,11 +40,12 @@ def preprocessing(base):
     # Dropping all columns with significant (>50%) amount of null values (with the exception of IMDB rating)
     base.drop(columns=["imdb_id","tagline","production_companies","production_countries","spoken_languages","AverageRating","Poster_Link","Certificate","Meta_score","Star1","Star2","Star3","Star4","Director_of_Photography","Producers","Music_Composer"], inplace=True)
 
-    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating values with 0
+    base.fillna({"IMDB_Rating":-1}, inplace=True) # fill missing rating values with -1
+    base.fillna({"budget":0}, inplace=True) # fill missing budget values with 0
     base.fillna("Missing",inplace=True) # Filling all remaining null values with "Missing"
 
     base.drop_duplicates(inplace=True) # dropping duplicates while considering all columns
-    base.drop(columns=["vote_average","vote_count","revenue","budget", "keywords","overview_sentiment", "original_title", "all_combined_keywords"], inplace=True) # dropping numerical columns with significant amount of 0 values + keywords, overview_sentiment, original_title because it is unnecessary for this assignment
+    base.drop(columns=["vote_average","vote_count","revenue","keywords","overview_sentiment", "original_title", "all_combined_keywords"], inplace=True) # dropping numerical columns with significant amount of 0 values + keywords, overview_sentiment, original_title because it is unnecessary for this assignment
 
     # Convert string to list with , delimiter
     base['Director'] = base['Director'].apply(lambda x: x.split(', '))
@@ -76,7 +77,8 @@ def preprocessing(base):
     # making new id one, reordering cols
     # base.drop(columns=["id"], inplace=True)
     base["movie_id"] = range(1, len(base) + 1)
-    base = base.iloc[:,[0,15,1,2,3,4,5,6,7,8,9,11]]
+    base = base.iloc[:,[0,16,1,2,3,4,5,6,7,8,9,10,12]]
+    print(base.columns)
 
     actors.columns = ["actor_id","actor_name"]
     director.columns = ["director_id","director_name"]
@@ -88,7 +90,8 @@ def preprocessing(base):
     MovieGenre = match_ids(base, MovieGenre, genres, genres.columns[0], genres.columns[1])
     MovieWriter = match_ids(base, MovieWriter, writer, writer.columns[0], writer.columns[1])
 
-    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11]] # reordering to remove old id col
+    base = base.iloc[:,[1,2,3,4,5,6,7,8,9,10,11,12]] # reordering to remove old id col
+    print(base.columns)
 
     # removing non-ascii chars
     base = base.map(remove_non_ascii)
@@ -112,23 +115,23 @@ def preprocessing(base):
     initial_pop_max = base.popularity.max()
     initial_imdb_max = base["IMDB_Rating"].max()
     base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
-    base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
+    #base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
 
 # exporting to csv, feel free to comment if you want
-Movie.to_csv("backend/csv/Movie.csv", index=False)
-Director.to_csv("backend/csv/Director.csv", index=False)
-Writer.to_csv("backend/csv/Writer.csv", index=False)
-Genre.to_csv("backend/csv/Genre.csv", index=False)
-Actor.to_csv("backend/csv/Actor.csv", index=False)
+# Movie.to_csv("backend/csv/Movie.csv", index=False)
+# Director.to_csv("backend/csv/Director.csv", index=False)
+# Writer.to_csv("backend/csv/Writer.csv", index=False)
+# Genre.to_csv("backend/csv/Genre.csv", index=False)
+# Actor.to_csv("backend/csv/Actor.csv", index=False)
 
-MovieDirector.to_csv("backend/csv/MovieDirector.csv", index=False)
-MovieWriter.to_csv("backend/csv/MovieWriter.csv", index=False)
-MovieGenre.to_csv("backend/csv/MovieGenre.csv", index=False)
-MovieActor.to_csv("backend/csv/MovieActor.csv", index=False)
+# MovieDirector.to_csv("backend/csv/MovieDirector.csv", index=False)
+# MovieWriter.to_csv("backend/csv/MovieWriter.csv", index=False)
+# MovieGenre.to_csv("backend/csv/MovieGenre.csv", index=False)
+# MovieActor.to_csv("backend/csv/MovieActor.csv", index=False)
 
 # MySQL connection credentials
 username = os.getenv("USER")
@@ -163,6 +166,7 @@ with engine.connect() as sql_con:
                         `release_date` date DEFAULT NULL,
                         `runtime` int(20) DEFAULT NULL,
                         `adult` bool DEFAULT NULL,
+                        `budget` int(20) DEFAULT NULL,
                         `original_language` varchar(20) DEFAULT NULL,
                         `overview` text DEFAULT NULL,
                         `popularity` double DEFAULT NULL,

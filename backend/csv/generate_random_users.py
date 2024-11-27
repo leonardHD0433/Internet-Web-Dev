@@ -35,7 +35,7 @@ def generate_users(num_users=100):
     
     # Create DataFrame
     df = pd.DataFrame({
-        'password': [f'pass{i+1}' for i in range(num_users)],
+        'password': [f'password{i+1}' for i in range(num_users)],
         'user_name': [f'User {i+1}' for i in range(num_users)],
         'user_email': emails,
         'date_joined': dates
@@ -44,5 +44,5 @@ def generate_users(num_users=100):
     return df
 
 # Generate users and save to CSV
-users_df = generate_users(100)
+users_df = generate_users(300)
 users_df.to_csv('backend/csv/Users_Dummy_Data.csv', index=False)

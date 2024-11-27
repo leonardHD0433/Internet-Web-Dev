@@ -168,7 +168,7 @@ const ComparePage = () => {
     }
   };
 
-  const handleCompareData = (leftData, rightData) => {
+  const handleCompareData = () => {
     if (!leftData || !rightData) return;
   
     const data = selectedMetrics.map((metric) => {
@@ -177,14 +177,14 @@ const ComparePage = () => {
   
       // Avoid division by zero
       const maxValue = Math.max(leftValue, rightValue, 1);
-      
+  
       const leftResult = ((leftValue / maxValue) * 10).toFixed(2);
       const rightResult = ((rightValue / maxValue) * 10).toFixed(2);
   
       return {
         subject: metric,
-        [leftMovie.title]: parseFloat(leftResult),
-        [rightMovie.title]: parseFloat(rightResult),
+        [leftData.title]: parseFloat(leftResult),
+        [rightData.title]: parseFloat(rightResult),
       };
     });
   
@@ -216,11 +216,19 @@ const ComparePage = () => {
 
   useEffect(() => {
     if (leftData && rightData) {
-      handleCompareData(leftData, rightData);
+      handleCompareData();
     }
     console.log('Left Data:', leftData);
     console.log('Right Data:', rightData);
   }, [selectedMetrics, leftData, rightData]);
+
+  useEffect(() => {
+    if (leftData && rightData) {
+      handleCompareData();
+    }
+    console.log('Left Data:', leftData);
+    console.log('Right Data:', rightData);
+  }, [selectedMetrics, leftMovie, rightMovie]);
 
   return (
     <div className="compare-container" style={containerStyle}>
