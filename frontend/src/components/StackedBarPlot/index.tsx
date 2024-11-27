@@ -189,7 +189,7 @@ export const StackedBarplot = ({
       <div className="control-panel">
         <div className="button-container">
           <button onClick={selectAll}>Select All</button>
-          <button onClick={deselectAll}>Deselect All</button>   
+          <button onClick={deselectAll}>Deselect All</button>
         </div>   
         <div className="checkbox-container">
 

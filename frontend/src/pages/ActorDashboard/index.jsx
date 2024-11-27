@@ -2,18 +2,21 @@ import React, { useState, useEffect, useRef } from 'react';
 import SidePanel from '../../components/SidePanel';
 import { StackedBarplot } from '../../components/StackedBarPlot/';
 import RatingBox from '../../components/RatingBoxActor';
+import CircularBarplot from '../../components/CircularBarPlot/';
 import './styles.css';
 
 function ActorRanking({ connectionStatus, handleStatusClick }) { 
-    const [actors, setActors] = useState([]);
-    const [isLoadingRank, setIsLoadingRank] = useState(true);
-    const [isLoadingProlific, setIsLoadingProlific] = useState(true);
+    const [overallActors, setOverallActors] = useState([]);
     const [barplotData, setBarplotData] = useState([]);
     const [genres, setGenres] = useState([]);
     const [selectedGenre, setSelectedGenre] = useState('All Genres'); 
     const [selectedYear, setSelectedYear] = useState("All Years"); 
     const [topActors, setTopActors] = useState([]);
+    const [ActorsGenre, setActorsGenre] = useState([]);
     const [isLoadingTopActors, setIsLoadingTopActors] = useState(true);
+    const [isLoadingRank, setIsLoadingRank] = useState(true);
+    const [isLoadingProlific, setIsLoadingProlific] = useState(true);
+    const [isloadingActorsGenre, setisLoadingActorsGenre] = useState(true);
 
     const scrollContainerRef = useRef(null);
 
@@ -25,7 +28,7 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
                     throw new Error('Network response was not ok');
                 }
                 const actorData = await response.json();
-                setActors(actorData.actors);
+                setOverallActors(actorData.actors);
                 console.log(actorData.actors);
             } catch (error) {
                 console.error('Error overall actors:', error);
@@ -63,7 +66,7 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
         setIsLoadingTopActors(true);
         const fetchTopActors = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/ActorByGenre?genre=${selectedGenre}&year=${selectedYear}`);
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/TopActorByGenre?genre=${selectedGenre}&year=${selectedYear}`);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -77,6 +80,24 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
         };
         fetchTopActors();
     }, [selectedGenre, selectedYear]);
+
+    useEffect(() => {
+        const fetchCircularBarPlot = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/ActorsByGenre`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const circularBarRequest = await response.json();
+                setActorsGenre(circularBarRequest);
+            } catch (error) {
+                console.error('Error fetching top prolific actors:', error);
+            } finally {
+                setisLoadingActorsGenre(false); 
+            }
+        };
+        fetchCircularBarPlot();
+    }, []);
 
     const scrollLeft = () => {
         if (scrollContainerRef.current) {
@@ -92,6 +113,7 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
 
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => 1900 + i);
+    console.log(ActorsGenre);
 
     return (
         <div className="actor-dashboard">
@@ -107,8 +129,13 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
                 </div>
             </div>
             <div className="mid-row">
-                <div className="density-box">
-
+                <div className="circular-bar-box">
+                <h3>Number Of Actors Per Genre</h3>
+                    {isloadingActorsGenre ? (
+                        <p>Fetching Data...</p>
+                    ) : (
+                    <CircularBarplot width={400} height={580} data={ActorsGenre} /> 
+                    )}
                 </div>
                 <div className="actor-rank-box">
                     <div className="ovr-container scale-content">
@@ -117,36 +144,36 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
                             <p>Fetching Data...</p>
                         ) : (
                             <div className="place-containers">
-                                {actors.length >= 3 && (
+                                {overallActors.length >= 3 && (
                                     <>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-2">2</div>
-                                            <div key={actors[1].actor_id} className="place-box place-box-2">
-                                                <h3><strong>{actors[1].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[1].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[1].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[1].most_common_genre}<br />
-                                                <strong>Number of Movies:</strong><br /> {actors[1].movie_count}
+                                            <div key={overallActors[1].actor_id} className="place-box place-box-2">
+                                                <h3><strong>{overallActors[1].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[1].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[1].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[1].most_common_genre}<br />
+                                                <strong>Number of Movies:</strong><br /> {overallActors[1].movie_count}
                                             </div>
                                         </div>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-1">1</div>
-                                            <div key={actors[0].actor_id} className="place-box place-box-1">
-                                                <h3><strong>{actors[0].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[0].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[0].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[0].most_common_genre}<br />
-                                                <strong>Number of Movies:</strong><br /> {actors[0].movie_count}
+                                            <div key={overallActors[0].actor_id} className="place-box place-box-1">
+                                                <h3><strong>{overallActors[0].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[0].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[0].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[0].most_common_genre}<br />
+                                                <strong>Number of Movies:</strong><br /> {overallActors[0].movie_count}
                                             </div>
                                         </div>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-3">3</div>
-                                            <div key={actors[2].actor_id} className="place-box place-box-3">
-                                                <h3><strong>{actors[2].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[2].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[2].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[2].most_common_genre}<br />
-                                                <strong>Number of Movies:</strong><br /> {actors[2].movie_count}
+                                            <div key={overallActors[2].actor_id} className="place-box place-box-3">
+                                                <h3><strong>{overallActors[2].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[2].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[2].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[2].most_common_genre}<br />
+                                                <strong>Number of Movies:</strong><br /> {overallActors[2].movie_count}
                                             </div>
                                         </div>
                                     </>
@@ -162,36 +189,36 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
                             <p>Fetching Data...</p>
                         ) : (
                             <div className="place-containers">
-                                {actors.length === 6 && (
+                                {overallActors.length === 6 && (
                                     <>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-2">2</div>
-                                            <div key={actors[4].actor_id} className="place-box place-box-2">
-                                                <h3><strong>{actors[4].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[4].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[4].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[4].most_common_genre}<br />
-                                                <strong>Watchlist adds:</strong><br /> {actors[4].movie_count}
+                                            <div key={overallActors[4].actor_id} className="place-box place-box-2">
+                                                <h3><strong>{overallActors[4].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[4].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[4].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[4].most_common_genre}<br />
+                                                <strong>Watchlist adds:</strong><br /> {overallActors[4].movie_count}
                                             </div>
                                         </div>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-1">1</div>
-                                            <div key={actors[3].actor_id} className="place-box place-box-1">
-                                                <h3><strong>{actors[3].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[3].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[3].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[3].most_common_genre}<br />
-                                                <strong>Watchlist adds:</strong><br /> {actors[3].movie_count}
+                                            <div key={overallActors[3].actor_id} className="place-box place-box-1">
+                                                <h3><strong>{overallActors[3].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[3].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[3].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[3].most_common_genre}<br />
+                                                <strong>Watchlist adds:</strong><br /> {overallActors[3].movie_count}
                                             </div>
                                         </div>
                                         <div className="place-box-wrapper">
                                             <div className="place-number-3">3</div>
-                                            <div key={actors[5].actor_id} className="place-box place-box-3">
-                                                <h3><strong>{actors[5].actor_name}</strong></h3>
-                                                <strong>Average Popularity:</strong><br /> {actors[5].average_popularity}<br />
-                                                <strong>Average Critic Score:</strong><br /> {actors[5].average_imdb_rating}<br />
-                                                <strong>Most Common Genre:</strong><br /> {actors[5].most_common_genre}<br />
-                                                <strong>Watchlist adds:</strong><br /> {actors[5].movie_count}
+                                            <div key={overallActors[5].actor_id} className="place-box place-box-3">
+                                                <h3><strong>{overallActors[5].actor_name}</strong></h3><br />
+                                                <strong>Average Popularity:</strong><br /> {overallActors[5].average_popularity}<br />
+                                                <strong>Average Critic Score:</strong><br /> {overallActors[5].average_imdb_rating}<br />
+                                                <strong>Most Common Genre:</strong><br /> {overallActors[5].most_common_genre}<br />
+                                                <strong>Watchlist adds:</strong><br /> {overallActors[5].movie_count}
                                             </div>
                                         </div>
                                     </>

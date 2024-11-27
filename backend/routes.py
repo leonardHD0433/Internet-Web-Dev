@@ -155,7 +155,7 @@ def top_prolific_actors(db: Session = Depends(get_db)):
     return data
 
 
-@router.get("/ActorByGenre")
+@router.get("/TopActorByGenre")
 def top_actors_genres(genre: str, year: str, db: Session = Depends(get_db)):
     # Get the top 15 actors with the most number of movies in the selected genre and year
     query = db.query(
@@ -212,3 +212,20 @@ def top_actors_genres(genre: str, year: str, db: Session = Depends(get_db)):
     return {
         "actors": actors_data
     }
+
+@router.get("/ActorsByGenre")
+def actors_per_genre(db: Session = Depends(get_db)):
+    # Query to get the number of actors that have acted in each genre
+    genre_actor_counts = db.query(
+        Genre.genre_label,
+        func.count(MovieActor.actor_id.distinct()).label('actor_count')
+    ).join(MovieGenre, Genre.genre_id == MovieGenre.genre_id
+    ).join(MovieActor, MovieGenre.movie_id == MovieActor.movie_id
+    ).group_by(Genre.genre_label
+    ).filter(Genre.genre_id != 1, MovieActor.actor_id != 5
+    ).all()
+
+    # Format the result in the required structure
+    result = [{"category": genre.genre_label, "value": genre.actor_count} for genre in genre_actor_counts]
+
+    return result
