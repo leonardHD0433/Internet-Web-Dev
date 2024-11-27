@@ -117,7 +117,9 @@ def preprocessing(base):
     #base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
 
     # turning values above 0.07 to 0 for popularity col
-    # base.popularity = base.popularity.apply(lambda x: 0 if x > 0.07 else x)
+    base.popularity = base.popularity.apply(lambda x: 0.07 if x > 0.07 else x)
+    base.popularity = base.popularity.apply(lambda x: x*(100/0.07))
+
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
