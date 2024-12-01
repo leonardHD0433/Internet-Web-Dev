@@ -662,6 +662,35 @@ def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
         "date_released": date_released
     }
 
+@router.get("/search-movie-detail/{movie_id}")
+def search_movie_by_id(movie_id: int, db: Session = Depends(get_db)):
+    movie = db.query(Movie).filter(Movie.movie_id == movie_id).first()
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+
+    # Get actors, directors, writers, and genres for the movie
+    actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie_id).all()
+    directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie_id).all()
+    writers = db.query(Writer).join(MovieWriter).filter(MovieWriter.movie_id == movie_id).all()
+    genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie_id).all()
+    date_released = movie.release_date.strftime("%d-%m-%Y") if movie.release_date else "N/A"
+
+    return {
+        "title": movie.title,
+        "status": movie.status,
+        "runtime": movie.runtime,
+        "budget": movie.budget,
+        "actors": [actor.actor_name for actor in actors],
+        "directors": [director.director_name for director in directors],
+        "writers": [writer.writer_name for writer in writers],
+        "genres": [genre.genre_label for genre in genres],
+        "release_date": date_released,
+        "language": movie.original_language,
+        "overview": movie.overview,
+        "imdb_rating": movie.imdb_rating,
+        "popularity": movie.popularity
+    }
+
 @router.get("/search-movie-graph/{movie_id}")
 def search_movie_graph(movie_id: int, db: Session = Depends(get_db)):
     movie = db.query(Movie).filter(Movie.movie_id == movie_id).first()

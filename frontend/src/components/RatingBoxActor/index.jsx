@@ -13,7 +13,7 @@ const RatingBox = ({ name, movie_count, budget, genre, imdbRating, popularity })
     return (
         <div className="rating-box-container">
             <div className="rating-box-text">           
-                <div className="rating-box-title">{name}</div>
+                <div className="rating-box-title-actor">{name}</div>
                 <div className="rating-box-description">
                     Total Movies Acted:<br/> <span className = "renderedTxt">{movie_count}</span><br />
                     Average Movie Budget:<br/> <span className = "renderedTxt">{formattedBudget}</span><br />

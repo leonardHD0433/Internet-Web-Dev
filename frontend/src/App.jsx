@@ -12,6 +12,7 @@ import ComparePage from './pages/ComparePage';
 import ActorRanking from './pages/ActorDashboard';
 import AboutUs from './pages/AboutUs'
 import Profile from './pages/ProfilePage'
+import DetailedMoviePage from './pages/DetailedMoviePage';
 import './App.css'
 import './styles/index.css'
 
@@ -121,6 +122,7 @@ function App() {
             <Route path="actor-ranking" element={<ActorRanking />} />
             <Route path="about-us" element={<AboutUs />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="movie/:id" element={<DetailedMoviePage />} />
           </Route>
         ) : (
           <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
