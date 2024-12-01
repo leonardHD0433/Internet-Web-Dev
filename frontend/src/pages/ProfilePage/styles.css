@@ -1,5 +1,13 @@
 .profile-Dashboard {
     padding: 20px;
+    display: flex;
+    height: 100vh; 
+    width: calc(100vw - 120px); 
+    flex-direction: column;
+    align-items: center;
+    margin-top: 200px;
+    margin-left: 100px;
+    overflow: auto;
   }
   
   .profile-header {
@@ -13,17 +21,130 @@
   }
   
   .stats-container {
-    display: grid;
-    justify-content: center;
-    text-align: center;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, auto);
-    gap: 20px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap : 20px;
+    align-items: center;
+    flex-wrap : wrap;
   }
+
   
   .stat-box {
     background-color: var(--Color-5, grey);
+    flex: 1;
+    width: 100%;
+    margin: 10px 0;
     padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    min-width: 200px;
   }
+
+  .word-cloud {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 300px;
+    background: black; /* Uncomment to see the space */
+    border-radius: 5px;
+
+  }
+
+  .word-cloud-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 500px;
+    height : 500px;
+    margin-top: 120px;
+    border: yellow solid;
+  }
+
+  .word-cloud-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .dashboard-header{
+    display: flex;
+    flex-direction: row;
+    width: 1350px;
+    justify-content: space-between;
+    margin-top: 760px;
+    margin-left: 200px;
+    margin-right: 200px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.dashboard-header-title{
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.dashboard-header-button {
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header-leftbutton,
+.dashboard-header-rightbutton {
+    margin: 0 10px; /* Add margin to create space between buttons */
+}
+
+.dashboard-header-leftbutton button,
+.dashboard-header-rightbutton button {
+    font-size: 24px;
+    font-weight: bold;
+    width: 40px;          /* Set fixed width */
+    height: 40px;         /* Set fixed height */
+    display: flex;        /* Center the text */
+    justify-content: center;
+    align-items: center;
+    line-height: 1;       /* Adjust line height */
+    border-radius: 5px;   /* Optional: rounded corners */
+}
+
+.dashboard-space-rating {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    width: 1350px;
+    height: auto;
+    margin-bottom: 20px;
+    border-radius: 20px;
+    background: #667A8A; /*Uncomment to see the space*/
+    flex-wrap: wrap;
+}
+  
+.dashboard-rating {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 410px;
+    height: 100%;
+    flex: 1;
+    background: var(--Color-5, grey);
+    border-radius: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.watchlist{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -350px;
+    width: 300px;
+    height: 300px;
+    border-radius: 5px;
+}

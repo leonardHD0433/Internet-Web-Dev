@@ -709,3 +709,62 @@ def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
         'total_runtime': result.total_runtime
     }
 
+@router.get("/watchlist-actor-count")
+def watchlist_actor_count(user_id: int, db: Session = Depends(get_db)):
+    # Subquery to get one actor per movie in the user's watchlist
+    subquery = db.query(
+        MovieActor.actor_id,
+        MovieActor.movie_id,
+        func.row_number().over(partition_by=MovieActor.movie_id, order_by=MovieActor.actor_id).label('row_num')
+    ).join(Watchlist, MovieActor.movie_id == Watchlist.movie_id
+    ).filter(Watchlist.user_id == user_id
+    ).subquery()
+
+    # Query to count the occurrences of each actor
+    actor_counts = db.query(
+        Actor.actor_name,
+        func.count(subquery.c.actor_id).label('count')
+    ).join(subquery, Actor.actor_id == subquery.c.actor_id
+    ).filter(subquery.c.row_num == 1
+    ).group_by(Actor.actor_name
+    ).order_by(func.count(subquery.c.actor_id).desc()
+    ).all()
+
+    # Get the top 5 most common actors
+    top_actors = actor_counts[:5]
+
+    # Calculate the total number of remaining actors
+    remaining_actors_count = sum([count for _, count in actor_counts[5:]])
+
+    # Format the result in the required structure
+    result = [{"name": actor_name, "value": count} for actor_name, count in top_actors]
+
+    # Add the remaining actors count as "Misc."
+    if remaining_actors_count > 0:
+        result.append({"name": "Misc.", "value": remaining_actors_count})
+
+    return result
+
+@router.get("/watchlist-movies")
+def watchlist_movies(user_id: int, db: Session = Depends(get_db)):
+    # Query to get all movies in the user's watchlist
+    watchlist_movies = db.query(Movie).join(Watchlist).filter(Watchlist.user_id == user_id).all()
+
+    # Format data for frontend
+    result = []
+    for movie in watchlist_movies:
+        actors = db.query(Actor).join(MovieActor).filter(MovieActor.movie_id == movie.movie_id).all()
+        directors = db.query(Director).join(MovieDirector).filter(MovieDirector.movie_id == movie.movie_id).all()
+        genres = db.query(Genre).join(MovieGenre).filter(MovieGenre.movie_id == movie.movie_id).all()
+        released_date = movie.release_date.strftime("%d-%m-%Y") if movie.release_date else None
+        result.append({
+            "title": movie.title,
+            "director": [director.director_name for director in directors],
+            "starring": [actor.actor_name for actor in actors],
+            "genre": [genre.genre_label for genre in genres],
+            "imdbRating": movie.imdb_rating,
+            "popularity": movie.popularity,
+            "date_released": released_date
+        })
+
+    return result
