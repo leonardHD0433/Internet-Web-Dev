@@ -1,54 +1,73 @@
-import { useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import StatusButton from './components/StatusButton';
-import LoginForm from './components/LoginForm';
-import Logo from './components/Logo';
-import CreateAccountButton from './components/CreateAccountButton';
-import CreateAccountPage from './pages/CreateAccountPage';
-import ConnectionTest from './pages/ConnectionTest';
-import MainLayout from './components/MainLayout';
-import ActorDashboard from './pages/ActorDashboard';
-import AboutUs from './pages/AboutUs';
-import './App.css';
-import './styles/index.css';
+import { useState } from 'react'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import StatusButton from './components/StatusButton'
+import LoginForm from './components/LoginForm'
+import Logo from './components/Logo'
+import CreateAccountButton from './components/CreateAccountButton'
+import CreateAccountPage from './pages/CreateAccountPage'
+import ConnectionTest from './pages/ConnectionTest'
+import DashBoard from './pages/DashboardPage'
+import MainLayout from './components/MainLayout'
+import ComparePage from './pages/ComparePage';
+import ActorRanking from './pages/ActorDashboard';
+import AboutUs from './pages/AboutUs'
+import './App.css'
+import './styles/index.css'
+
 
 function App() {
-  const [showTest, setShowTest] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState('checking');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
+  const [showTest, setShowTest] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState('checking')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const navigate = useNavigate()
 
-  const handleStatusClick = () => setShowTest(!showTest);
-  const handleClose = () => setShowTest(false);
+  const handleStatusClick = () => setShowTest(!showTest)
+  const handleClose = () => setShowTest(false)
 
-  const handleLogin = async (credentials) => {
+  const handleLogin = async (credentials) => { 
     try {
       setIsLoading(true);
       setError(null);
-
-      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_LOGIN_PATH}?email=${credentials.email}&password=${credentials.password}`;
+      
+      const url = `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_LOGIN_PATH}?email=${encodeURIComponent(credentials.email)}&password=${encodeURIComponent(credentials.password)}`;
       console.info('Login request URL:', url);
-
+  
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
-        },
+        }
       });
-
-      console.info('Response status:', response.status);
-
-      if (!response.ok) {
-        throw new Error('Invalid credentials');
-      }
-
+  
       const data = await response.json();
-      localStorage.setItem('user', JSON.stringify(data));
-      setIsAuthenticated(true);
-      navigate('/dashboard');
+  
+      if (!response.ok) {
+        const errorMsg = data.detail || 'Login failed'; // Get error message from API response
+        setError(errorMsg);
+        alert(errorMsg); // Show alert with API error message
+        setIsAuthenticated(false);
+        throw new Error(errorMsg);
+      }
+  
+      if (data.success) {
+        // Store user data matching backend response
+        const userData = {
+          userId: data.user_id,
+          userName: data.user_name,
+          email: data.email
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        setIsAuthenticated(true);
+        navigate('/dashboard');
+      } else {
+        throw new Error('Login failed');
+      }
+  
     } catch (err) {
+      console.error('Login error:', err);
       setError(err.message);
       setIsAuthenticated(false);
     } finally {
@@ -58,57 +77,59 @@ function App() {
 
   const handleStatusUpdate = (apiStatus, dbStatus) => {
     if (apiStatus === 'healthy' && dbStatus === 'connected') {
-      setConnectionStatus('healthy');
+      setConnectionStatus('healthy')
     } else if (apiStatus === 'failed' || dbStatus === 'disconnected') {
-      setConnectionStatus('failed');
+      setConnectionStatus('failed')
     } else {
-      setConnectionStatus('checking');
+      setConnectionStatus('checking')
     }
-  };
+  }
 
   return (
     <div className="app">
       <Routes>
-        <Route
-          path="/"
-          element={
-            <div className="main-content">
-              <StatusButton status={connectionStatus} onClick={handleStatusClick} />
-              <Logo />
-              <LoginForm onSubmit={handleLogin} />
-              <CreateAccountButton />
-            </div>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <div className="main-content">
-              <StatusButton status={connectionStatus} onClick={handleStatusClick} />
-              <CreateAccountPage />
-            </div>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
-                <div>Dashboard Page</div>
-              </MainLayout>
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
-        <Route
-          path="/about-us"
-          element={<AboutUs connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />}
-        />
-        <Route
-          path="/actor-dashboard"
-          element={<ActorDashboard connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />}
-        />
+        <Route path="/" element={
+          <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} />
+            <Logo />
+            <LoginForm onSubmit={handleLogin} />
+            <CreateAccountButton />
+          </div>
+        } />
+        <Route path="/register" element={
+          <div className="main-content">
+            <StatusButton status={connectionStatus} onClick={handleStatusClick} />
+            <CreateAccountPage />
+          </div>
+        } />
+        {isAuthenticated ? (
+          <Route
+            path="/dashboard/*"
+            element={
+              <MainLayout
+                connectionStatus={connectionStatus}
+                handleStatusClick={handleStatusClick}
+              />
+            }
+          >
+            <Route index element={<DashBoard />}/>
+            <Route path="compare" element={<ComparePage />} />
+            <Route path="actor-ranking" element={<ActorRanking />} />
+            <Route path="about-us" element={<AboutUs />} />
+          </Route>
+        ) : (
+          <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
+        )}
+        <Route path="/dashboard" element={
+          isAuthenticated ? (
+            <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
+              <div>Dashboard Page</div>
+            </MainLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       {showTest && (
@@ -117,7 +138,7 @@ function App() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

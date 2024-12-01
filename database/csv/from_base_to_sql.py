@@ -2,8 +2,8 @@ import pandas as pd
 import ast
 import re
 import sqlalchemy
-from sqlalchemy import create_engine, text
 import os
+from sqlalchemy import create_engine, text
 base_df = pd.read_csv("database\csv\IMDb_Dataset_Edited.csv")
 
 # function for adding new index col for actor, director, genre, writer, reordering id col to left
@@ -113,14 +113,30 @@ def preprocessing(base):
 
     # Mapping the range of popularity values/IMDB ratings to a range of 0-100
     initial_pop_max = base.popularity.max()
-    initial_imdb_max = base["IMDB_Rating"].max()
+    #initial_imdb_max = base["IMDB_Rating"].max()
     base.popularity = base.popularity.apply(lambda x: x*(100/initial_pop_max))
     #base["IMDB_Rating"] = base["IMDB_Rating"].apply(lambda x: x*(100/initial_imdb_max) if x != -1 else x)
+
+    # turning values above 0.07 to 0 for popularity col
+    base.popularity = base.popularity.apply(lambda x: 0.07 if x > 0.07 else x)
+    base.popularity = base.popularity.apply(lambda x: x*(100/0.07))
+
 
     return base, actors, director, genres, writer, MovieActor, MovieDirector, MovieGenre, MovieWriter
 
 Movie, Actor, Director, Genre, Writer, MovieActor, MovieDirector, MovieGenre, MovieWriter = preprocessing(base_df)
 
+# exporting to csv, feel free to comment if you want
+# Movie.to_csv("Movie.csv", index=False)
+# Director.to_csv("Director.csv", index=False)
+# Writer.to_csv("Writer.csv", index=False)
+# Genre.to_csv("Genre.csv", index=False)
+# Actor.to_csv("Actor.csv", index=False)
+
+# MovieDirector.to_csv("MovieDirector.csv", index=False)
+# MovieWriter.to_csv("MovieWriter.csv", index=False)
+# MovieGenre.to_csv("MovieGenre.csv", index=False)
+# MovieActor.to_csv("MovieActor.csv", index=False)
 
 # MySQL connection credentials
 username = os.getenv("USER")
@@ -265,7 +281,8 @@ with engine.connect() as sql_con:
                         `user_id` int(20) NOT NULL AUTO_INCREMENT,
                         `password` varchar(20) NOT NULL,
                         `user_name` varchar(100) NOT NULL,
-                        `user_email` varchar(100) NOT NULL,
+                        `user_email` varchar(50) NOT NULL,
+                         date_joined date NOT NULL,
                         PRIMARY KEY (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
@@ -295,15 +312,7 @@ with engine.connect() as sql_con:
                         CONSTRAINT `watchlist_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
                         ) ENGINE=InnoDB DEFAULT CHARSET=ascii COLLATE=ascii_bin
                         """))
-    
-    # Add dummy data for testing
-    print("Add dummy data for testing...")
-    sql_con.execute(text("""
-                        INSERT INTO imdb_moviedb.users (password,user_name,user_email) VALUES ("password","Johnathan","Joh@gmail.com");
-                        INSERT INTO imdb_moviedb.watchlist (user_id,movie_id) VALUES (1,3692),(1,8910),(1,16498),(1,37014),(1,71679),(1,24561),(1,16718),(1,20043);
-                        """))
-    
-    
+
     
 # import dfs into SQL tables
 print("Importing into movie...")

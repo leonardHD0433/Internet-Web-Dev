@@ -10,8 +10,28 @@ import compareIcon from '../../assets/Chat.svg';
 import profileIcon from '../../assets/Category.svg';
 import logoutIcon from '../../assets/Logout.svg';
 import StatusButton from '../StatusButton'; 
+import { useNavigate } from 'react-router-dom';
 
 const SidePanel = ({ connectionStatus, handleStatusClick }) => {
+  const navigate = useNavigate();
+
+  const handleHome = () => {
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}`);
+  };
+
+  const handleCompare = () => {
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_COMPARE_PATH}`);
+  };
+
+  const handleActors = () => {
+    navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_ACTOR_PATH}`);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/');
+  };
+
   return (
     <div className="side-panel">
       <div className="panel-content">
@@ -20,7 +40,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
           <img src={textImg} alt="Text" className="text-img" />
         </div>
         <div className="panel-options">
-          <div className="panel-item" onClick={() => console.log('Home clicked')}>
+          <div className="panel-item" onClick={handleHome}>
             <img src={homeIcon} alt="Home" className="icon home-icon" />
             <div className="label">Home</div>
           </div>
@@ -28,7 +48,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
             <img src={moviesIcon} alt="Movie" className="icon movies-icon" />
             <div className="label">Movies</div>
           </div>
-          <div className="panel-item" onClick={() => console.log('Actors clicked')}>
+          <div className="panel-item" onClick={handleActors}>
             <img src={actorsIcon} alt="Actor" className="icon actors-icon" />
             <div className="label">Actors</div>
           </div>
@@ -36,7 +56,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
             <img src={directorsIcon} alt="Director" className="icon directors-icon" />
             <div className="label">Directors</div>
           </div>
-          <div className="panel-item" onClick={() => console.log('Compare clicked')}>
+          <div className="panel-item" onClick={handleCompare}>
             <img src={compareIcon} alt="Compare" className="icon compare-icon" />
             <div className="label">Compare</div>
           </div>
@@ -47,7 +67,7 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
         </div>
         <div className="panel-exit">
             <div><StatusButton status={connectionStatus} onClick={handleStatusClick} /></div>
-            <div className="panel-item" onClick={() => console.log('Logout clicked')}>
+            <div className="panel-item" onClick={handleLogout}>
                 <img src={logoutIcon} alt="Logout" className="icon logout-icon" />
             <div className="label">Logout</div>
         </div>

@@ -1,0 +1,36 @@
+.half-circle-meter-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+}
+
+.half-circle-meter {
+    position: relative;
+    width: 125px; /* Adjusted width */
+    height: 50px; /* Adjusted height */
+}
+
+.half-circle {
+    fill: none;
+    stroke-width: 10; /* Adjusted stroke width */
+}
+
+.needle {
+    fill: black; /* Changed needle color to black */
+    stroke: black; /* Changed needle color to black */
+    transform-origin: 50% 100%;
+    transition: transform 0.3s ease-in-out;
+}
+
+.no-rating {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    font-size: 0px;
+    margin-left: 25px;
+}

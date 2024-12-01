@@ -1,0 +1,68 @@
+.search-container {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 16px;
+    position: relative;
+    z-index: 1000;
+    transition: margin-top 0.03s ease; /* Add smooth transition */
+}
+
+.suggestions-list {
+    position: absolute;
+    width: 100%;
+    top: calc(100% - 16px); /* Adjust for container padding */
+    left: 0;
+    margin-top: 4px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1001; /* Higher than container */
+    max-height: 300px;
+    overflow-y: auto;
+}
+  
+.search-container .MuiTextField-root {
+    width: 100%;
+}
+  
+.custom-textfield {
+    background-color: #ECE6F0;
+    border-radius: 28px;
+}
+
+.custom-textfield .MuiOutlinedInput-root {
+    border-radius: 28px;
+}
+
+.custom-textfield .MuiOutlinedInput-root:hover fieldset {
+    border-color: #667A8A;
+}
+
+.custom-textfield .MuiOutlinedInput-input::placeholder {
+    color: #667A8A;
+    opacity: 1;
+}
+
+/* Remove label styling since we're not using it */
+.custom-textfield .MuiInputLabel-root {
+    display: none;
+}
+
+.suggestion-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    color: black;
+}
+
+.suggestion-item:hover {
+    background-color: #ECE6F0;
+}
+
+.search-error {
+    color: #d32f2f;
+    font-size: 0.875rem;
+    margin-top: 8px;
+    padding: 0 16px;
+}

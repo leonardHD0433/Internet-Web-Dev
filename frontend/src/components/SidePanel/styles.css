@@ -10,10 +10,9 @@
     justify-content: space-between;
     transition: width 0.3s;
     position: fixed; /* Position it on the left side */
+    top: 0; /* Align to the top */
     left: 0; /* Align to the left */
     overflow: hidden;
-    opacity: 1;
-    z-index: 1000;
 }
 
 .side-panel:hover {
@@ -69,14 +68,15 @@
 }
 
 .panel-exit {
-    margin-top: 250px;
+    margin-top: auto;
+    margin-bottom: 50px;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
 .side-panel:hover .panel-exit {
-    margin-top: 130px;
+    margin-top: auto;
 }
 
 .panel-exit .status-button {

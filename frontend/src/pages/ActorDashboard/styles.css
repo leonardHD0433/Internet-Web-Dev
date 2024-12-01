@@ -1,6 +1,8 @@
 .actor-dashboard {
     display: flex;
     flex-direction: column;
+    margin-left: 100px;
+    height: 900px;
     padding: 20px;
 }
 
@@ -9,7 +11,7 @@
 }
 
 .scale-content {
-    transform: scale(1); /* Adjust the scale value as needed */
+    transform: scale(0.70); /* Adjust the scale value as needed */
     transform-origin: top center;
 }
 

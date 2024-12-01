@@ -116,8 +116,7 @@ function ActorDashboard({ connectionStatus, handleStatusClick }) {
     console.log(ActorsGenre);
 
     return (
-        <div className="actor-dashboard">
-            <SidePanel connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />
+        <div className="actor-dashboard scale-content" >
             <div className="top-row">
                 <div className="bar-container">    
                 <h2><strong>Top 5 Most Prolific Actors</strong></h2>
@@ -138,7 +137,7 @@ function ActorDashboard({ connectionStatus, handleStatusClick }) {
                     )}
                 </div>
                 <div className="actor-rank-box">
-                    <div className="ovr-container scale-content">
+                    <div className="ovr-container">
                         <h3>Overall Actor Ranking</h3>
                         {isLoadingRank ? (
                             <p>Fetching Data...</p>
@@ -183,7 +182,7 @@ function ActorDashboard({ connectionStatus, handleStatusClick }) {
                     </div>
                 </div>
                 <div className="watchlist-box">
-                    <div className="ovr-container scale-content">
+                    <div className="ovr-container">
                         <h3>Most Watchlisted Actors</h3>
                         {isLoadingRank ? (
                             <p>Fetching Data...</p>

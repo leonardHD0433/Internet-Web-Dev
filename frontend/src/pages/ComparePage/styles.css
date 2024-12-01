@@ -1,0 +1,179 @@
+.nav-box {
+    z-index: 3;
+}
+
+.side-panel {
+    z-index: 4;
+}
+
+.compare-container {
+    position: relative;
+    width: 100%; /* Ensure the container takes the full width */
+    min-height: 100vh; /* Ensure the container takes the full height */
+    display: flex;
+    align-items: center; /* Center the content vertically */
+    flex-direction: column;
+    margin-left: 110px;
+}
+
+.compare-space {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    width: 1300px;
+    height: 280px;
+    margin-bottom: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    /* background: wheat; */ /* Uncomment to see the space */
+}
+  
+.compare-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 531px;
+    height: 100%;
+    background: lightgray;
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    position: relative;
+}
+
+.add-movie-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 5%;
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.plus-icon:hover {
+    color: #546A7B;
+}
+
+.plus-icon:focus {
+    outline: none;
+}
+
+.plus-icon {
+    font-size: 500px;
+    font-weight: bold;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 130px;
+    color: #667A8A;
+}
+
+.compare-graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 700px;
+    height: 318px;
+    /* background: wheat; */ /* Uncomment to see the space */
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.compare-graph-comment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 531px;
+    height: 100%;
+    background: lightgray;
+    border-radius: 20px;
+}
+
+.MuiDialog-paper {
+    min-width: 400px;
+}
+  
+.MuiListItem-root {
+    cursor: pointer;
+}
+
+.MuiListItem-root:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.rating-box-text {
+    margin-top: 15px;
+}
+
+/* styles.css in src/pages/ComparePage */
+
+.movie-selection {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.change-movie-button {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background-color: #667A8A;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.change-movie-button:hover {
+    background-color: #546A7B;
+}
+
+.compare-graph {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 900px;
+    height: 400px; /* Adjusted height */
+    border-radius: 20px;
+    margin-left: 50px;
+    margin-right: 50px;
+    background-color: #f5f5f5; /* Optional background color */
+    font-size: 30px;
+    color: black; /* Optional text color */
+}
+
+.compare-graph-comment {
+    width: 700px;
+    font-size: 25px;
+    color: white;
+    background-color: transparent;
+}
+
+.compare-graph-section {
+    display: flex;
+}
+
+.metrics-checkboxes {
+    display: flex;
+    flex-direction: column;
+    margin-left: 20px;
+}
+
+.metrics-checkboxes div {
+    margin-bottom: 5px;
+}
