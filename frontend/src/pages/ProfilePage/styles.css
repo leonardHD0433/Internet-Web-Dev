@@ -1,0 +1,29 @@
+.profile-Dashboard {
+    padding: 20px;
+  }
+  
+  .profile-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .welcome-message {
+    margin-bottom: 20px;
+  }
+  
+  .stats-container {
+    display: grid;
+    justify-content: center;
+    text-align: center;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 20px;
+  }
+  
+  .stat-box {
+    background-color: var(--Color-5, grey);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }

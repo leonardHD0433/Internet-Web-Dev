@@ -122,19 +122,6 @@ class Users(Base):
     user_email = Column(String(50), nullable=False)
     date_joined = Column(Date, nullable=False, server_default=func.current_date())
 
-class UserSearch(Base):
-    __tablename__ = "usersearch"
-
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True, index=True)
-    genre_id = Column(Integer, ForeignKey('genre.genre_id'), primary_key=True, index=True)
-    genre_label = Column(String(50), nullable=True)
-    search_count = Column(Integer, default=0, nullable=True)
-
-    user = relationship("Users", back_populates="searches")
-    genre = relationship("Genre", back_populates="user_searches")
-
-Genre.user_searches = relationship("UserSearch", back_populates="genre")
-Users.searches = relationship("UserSearch", back_populates="user")
 
 class Watchlist(Base):
     __tablename__ = "watchlist"

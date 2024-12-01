@@ -5,6 +5,11 @@ from routes import router
 
 app = FastAPI()
 
+origins = [
+    f"http://localhost:{os.getenv('FRONTEND_PORT')}",
+    f"http://127.0.0.1:{os.getenv('FRONTEND_PORT')}"
+]
+
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,

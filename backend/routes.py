@@ -693,8 +693,8 @@ def search_movie_graph(movie_id: int, db: Session = Depends(get_db)):
 @router.get("/watchlistStats")
 def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
     query = db.query(
-        func.avg(case([(Movie.imdb_rating != -1, Movie.imdb_rating)], else_=None)).label('avg_rating'),
-        func.avg(case([(Movie.popularity != 0, Movie.popularity)], else_=None)).label('avg_popularity'),
+        func.avg(case((Movie.imdb_rating != -1, Movie.imdb_rating), else_=None)).label('avg_rating'),
+        func.avg(case((Movie.popularity != 0, Movie.popularity), else_=None)).label('avg_popularity'),
         func.sum(Movie.runtime).label('total_runtime'),
         Users.user_name
     ).join(Watchlist, Watchlist.movie_id == Movie.movie_id
@@ -708,3 +708,4 @@ def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
         'average_popularity': round(result.avg_popularity, 2) if result.avg_popularity else "No Data",
         'total_runtime': result.total_runtime
     }
+
