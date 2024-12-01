@@ -13,6 +13,8 @@
     top: 0; /* Align to the top */
     left: 0; /* Align to the left */
     overflow: hidden;
+    opacity: 1;
+    z-index: 1000;
 }
 
 .side-panel:hover {

@@ -1,0 +1,49 @@
+.tooltip {
+  position: absolute;
+  background-color: #282F35;
+  border: outset;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 10px;
+  display: none;
+}
+
+.main-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.control-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.checkbox-container {
+  display: flex;
+  width: 50em;
+  gap: 5px;
+  border: black solid;
+  border-width: 3px; 
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.checkbox-item {
+  width: 18%;
+}
+
+.checkbox-container button {
+
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 10px;
+}

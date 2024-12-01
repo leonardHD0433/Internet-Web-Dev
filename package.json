@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/react": "^18.3.12",
+    "d3-hexbin": "^0.2.2"
+  }
+}

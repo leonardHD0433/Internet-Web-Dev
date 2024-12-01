@@ -10,7 +10,10 @@ import DashBoard from './pages/DashboardPage'
 import MainLayout from './components/MainLayout'
 import ComparePage from './pages/ComparePage';
 import ActorRanking from './pages/ActorDashboard';
+import ActorRanking from './pages/ActorDashboard'
 import './App.css'
+import './styles/index.css'
+
 
 function App() {
   const [showTest, setShowTest] = useState(false)
@@ -116,7 +119,19 @@ function App() {
         ) : (
           <Route path="/dashboard/*" element={<Navigate to="/" replace />} />
         )}
+        <Route path="/dashboard" element={
+          isAuthenticated ? (
+            <MainLayout connectionStatus={connectionStatus} handleStatusClick={handleStatusClick}>
+              <div>Dashboard Page</div>
+            </MainLayout>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        } />
+
+<Route path="/about-us" element={<AboutUs connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/actor-ranking" element={<ActorRanking connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />} />
       </Routes>
       {showTest && (
         <div className="test-overlay">

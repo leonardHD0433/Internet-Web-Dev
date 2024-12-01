@@ -1,0 +1,7 @@
+2D density graph:
+
+    <div className="density-box">
+        <strong>Density Map</strong>
+        <Hexbin width={450} height={275} data={data} allSubGroups={genres} />
+    </div>
+
