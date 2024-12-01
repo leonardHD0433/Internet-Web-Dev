@@ -719,6 +719,22 @@ def search_movie_graph(movie_id: int, db: Session = Depends(get_db)):
         "runtime":  runtime
     }
 
+@router.get("/add-watchlist")
+def add_to_watchlist(user_id: int, movie_id: int, db: Session = Depends(get_db)):
+    watchlist_entry = db.query(Watchlist).filter_by(user_id=user_id, movie_id=movie_id).first()
+    if watchlist_entry:
+        raise HTTPException(status_code=400, detail="Movie already in watchlist")
+
+    new_entry = Watchlist(user_id=user_id, movie_id=movie_id)
+    db.add(new_entry)
+    db.commit()
+    return {"success": True, "message": "Movie added to watchlist"}
+
+@router.get("/check-watchlist")
+def check_watchlist(user_id: int, movie_id: int, db: Session = Depends(get_db)):
+    watchlist_entry = db.query(Watchlist).filter_by(user_id=user_id, movie_id=movie_id).first()
+    return {"in_watchlist": bool(watchlist_entry)}
+
 @router.get("/watchlistStats")
 def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
     query = db.query(

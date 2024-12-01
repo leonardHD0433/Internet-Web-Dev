@@ -9,6 +9,9 @@ const DetailedMoviePage = () => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [inWatchlist, setInWatchlist] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const userId = JSON.parse(localStorage.getItem('user')).userId;
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -23,6 +26,13 @@ const DetailedMoviePage = () => {
 
         const data = await response.json();
         setMovieDetails(data);
+
+        // Check if the movie is in the user's watchlist
+        const watchlistResponse = await fetch(
+          `${import.meta.env.VITE_API_URL}/check-watchlist?user_id=${userId}&movie_id=${id}`
+        );
+        const watchlistData = await watchlistResponse.json();
+        setInWatchlist(watchlistData.in_watchlist);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -31,7 +41,31 @@ const DetailedMoviePage = () => {
     };
 
     fetchMovieDetails();
-  }, [id]);
+  }, [id, userId]);
+
+  const handleAddToWatchlist = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_ADD_TO_WATCHLIST_PATH}?user_id=${userId}&movie_id=${id}`,
+        {
+          method: 'GET',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to add movie to watchlist');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setInWatchlist(true);
+        setShowSuccessMessage(true);
+        setTimeout(() => setShowSuccessMessage(false), 3000); // Hide success message after 3 seconds
+      }
+    } catch (err) {
+      console.error('Error adding movie to watchlist:', err);
+    }
+  };
 
   if (loading) {
     return <div className="detail-movie">Loading...</div>;
@@ -67,9 +101,14 @@ const DetailedMoviePage = () => {
             <p><strong>Director:</strong> <TextLooper texts={directorTexts} interval={3000} /></p>
           </div>
           <p className="movie-overview"><strong>Overview:</strong><br/> {movieDetails.overview || 'No overview available.'}</p>
-          <div className="watchlist-button">
-            <button>Add to Watchlist</button>
-          </div>
+          {!inWatchlist && (
+            <div className="watchlist-button">
+              <button onClick={handleAddToWatchlist}>Add to Watchlist</button>
+            </div>
+          )}
+          {showSuccessMessage && (
+            <div className="success-message">Movie added to watchlist!</div>
+          )}
         </div>
       </div>
       <div className="movie-stats">
