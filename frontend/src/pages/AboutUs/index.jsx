@@ -1,14 +1,14 @@
 import React from 'react';
-import './styles.css'; // Assuming you have some CSS for styling
-import SidePanel from '../../components/SidePanel'; // Import the SidePanel component
-import logo from '../../assets/CinerateLogo.png'; // Import the logo
+import { useOutletContext } from 'react-router-dom';
+import './styles.css'; 
+import logo from '../../assets/CinerateLogo.png'; 
 
-const AboutUs = ({ connectionStatus, handleStatusClick }) => {
+const AboutUs = () => {
+  const { connectionStatus, handleStatusClick, setIsAuthenticated } = useOutletContext();
+
   return (
     <div className="about-us">
-      <SidePanel connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} /> {/* Include the SidePanel */}
       <div className="logo-container">
-        {/* Temporarily replace the image with a placeholder image */}
         <img src={logo} alt="Placeholder Logo" className="img"  />
       </div>
       <div className="content">

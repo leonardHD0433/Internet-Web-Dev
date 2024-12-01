@@ -11,6 +11,7 @@ import MainLayout from './components/MainLayout'
 import ComparePage from './pages/ComparePage';
 import ActorRanking from './pages/ActorDashboard';
 import AboutUs from './pages/AboutUs'
+import Profile from './pages/ProfilePage'
 import './App.css'
 import './styles/index.css'
 
@@ -18,7 +19,9 @@ import './styles/index.css'
 function App() {
   const [showTest, setShowTest] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState('checking')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return !!localStorage.getItem('user');
+  });
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
   const navigate = useNavigate()
@@ -109,6 +112,7 @@ function App() {
               <MainLayout
                 connectionStatus={connectionStatus}
                 handleStatusClick={handleStatusClick}
+                setIsAuthenticated={setIsAuthenticated}
               />
             }
           >
@@ -116,6 +120,7 @@ function App() {
             <Route path="compare" element={<ComparePage />} />
             <Route path="actor-ranking" element={<ActorRanking />} />
             <Route path="about-us" element={<AboutUs />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
         ) : (
           <Route path="/dashboard/*" element={<Navigate to="/" replace />} />

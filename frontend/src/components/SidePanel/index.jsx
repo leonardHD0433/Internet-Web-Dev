@@ -8,11 +8,12 @@ import actorsIcon from '../../assets/Award.svg';
 import directorsIcon from '../../assets/Video.svg';
 import compareIcon from '../../assets/Chat.svg';
 import profileIcon from '../../assets/Category.svg';
+import aboutUsIcon from '../../assets/AboutUs.svg';
 import logoutIcon from '../../assets/Logout.svg';
 import StatusButton from '../StatusButton'; 
 import { useNavigate } from 'react-router-dom';
 
-const SidePanel = ({ connectionStatus, handleStatusClick }) => {
+const SidePanel = ({ connectionStatus, handleStatusClick, setIsAuthenticated }) => {
   const navigate = useNavigate();
 
   const handleHome = () => {
@@ -27,8 +28,21 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
     navigate(`${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_ACTOR_PATH}`);
   };
 
+  const handleAboutUs = () => {
+    const path = `${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_ABOUT_US_PATH}`;
+    console.log('Navigating to:', path);
+    navigate(path);
+  };
+
+  const handleProfile = () => {
+    const path = `${import.meta.env.VITE_API_DASHBOARD_PATH}${import.meta.env.VITE_API_PROFILE_PATH}`;
+    console.log('Navigating to:', path);
+    navigate(path);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('user');
+    setIsAuthenticated(false);
     navigate('/');
   };
 
@@ -60,10 +74,15 @@ const SidePanel = ({ connectionStatus, handleStatusClick }) => {
             <img src={compareIcon} alt="Compare" className="icon compare-icon" />
             <div className="label">Compare</div>
           </div>
-          <div className="panel-item" onClick={() => console.log('Profile clicked')}>
+          <div className="panel-item" onClick={handleProfile}>
             <img src={profileIcon} alt="Profile" className="icon profile-icon" />
             <div className="label">Profile</div>
           </div>
+          <div className="panel-item" onClick={handleAboutUs}>
+            <img src={aboutUsIcon} alt="Compare" className="icon aboutUs-icon" />
+            <div className="label">About Us</div>
+          </div>
+
         </div>
         <div className="panel-exit">
             <div><StatusButton status={connectionStatus} onClick={handleStatusClick} /></div>

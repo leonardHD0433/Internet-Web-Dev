@@ -35,7 +35,7 @@
     align-items: center;
     width: 531px;
     height: 100%;
-    background: lightgray;
+    background: var(--Color-5, grey);
     border-radius: 20px;
     margin-left: 50px;
     margin-right: 50px;

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, case
 from sqlalchemy.orm import Session
 from database import get_db
 from urllib.parse import unquote
@@ -688,4 +688,23 @@ def search_movie_graph(movie_id: int, db: Session = Depends(get_db)):
         "writers": [writer.writer_name for writer in writers],
         "genres": [genre.genre_label for genre in genres],
         "runtime":  runtime
+    }
+
+@router.get("/watchlistStats")
+def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
+    query = db.query(
+        func.avg(case([(Movie.imdb_rating != -1, Movie.imdb_rating)], else_=None)).label('avg_rating'),
+        func.avg(case([(Movie.popularity != 0, Movie.popularity)], else_=None)).label('avg_popularity'),
+        func.sum(Movie.runtime).label('total_runtime'),
+        Users.user_name
+    ).join(Watchlist, Watchlist.movie_id == Movie.movie_id
+    ).join(Users, Users.user_id == Watchlist.user_id
+    ).filter(Watchlist.user_id == user_id)
+
+    result = query.one()
+    return {
+        'user_name': result.user_name,
+        'average_rating': round(result.avg_rating, 2) if result.avg_rating else "No Data",
+        'average_popularity': round(result.avg_popularity, 2) if result.avg_popularity else "No Data",
+        'total_runtime': result.total_runtime
     }

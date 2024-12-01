@@ -71,7 +71,7 @@
     align-items: center;
     width: 410px;
     height: 100%;
-    background: lightgray;
+    background: var(--Color-5, grey);
     border-radius: 5px;
     margin-left: 20px;
     margin-right: 20px;

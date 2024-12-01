@@ -6,7 +6,7 @@ import SearchBar from '../SearchBar';
 import NotificationButton from '../NotificationButton';
 import SettingsButton from '../SettingsButton';
 
-const MainLayout = ({ connectionStatus, handleStatusClick }) => {
+const MainLayout = ({ connectionStatus, handleStatusClick, setIsAuthenticated }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (e) => {
@@ -16,7 +16,7 @@ const MainLayout = ({ connectionStatus, handleStatusClick }) => {
 
   return (
     <div className="main-layout">
-      <SidePanel connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} />
+      <SidePanel connectionStatus={connectionStatus} handleStatusClick={handleStatusClick} setIsAuthenticated={setIsAuthenticated} />
       <div className="main-content">
         <div className="nav-box">
           <div className="search-bar">
@@ -29,7 +29,7 @@ const MainLayout = ({ connectionStatus, handleStatusClick }) => {
             <SettingsButton />
           </div>
         </div>
-        <Outlet />
+        <Outlet context={{ connectionStatus, handleStatusClick, setIsAuthenticated }} />
       </div>
     </div>
   );

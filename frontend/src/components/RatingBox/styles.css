@@ -7,6 +7,7 @@
     width: 100%;
     height: 100%;
     z-index: 2;
+    background: var(--Color-5, grey);
 }
 
 .rating-box-text {
@@ -34,7 +35,7 @@
     font-weight: bold;
     margin-right: 1rem;
     margin-bottom: 5px;
-    color: blueviolet;
+    color: white;
     text-shadow: 0 0 5px rgba(138, 43, 226, 0.3);
     animation: titleGlow 2s ease-in-out infinite;
 }
