@@ -5,7 +5,7 @@ import RatingBox from '../../components/RatingBoxActor';
 import CircularBarplot from '../../components/CircularBarPlot/';
 import './styles.css';
 
-function ActorRanking({ connectionStatus, handleStatusClick }) { 
+function ActorDashboard({ connectionStatus, handleStatusClick }) { 
     const [overallActors, setOverallActors] = useState([]);
     const [barplotData, setBarplotData] = useState([]);
     const [genres, setGenres] = useState([]);
@@ -270,4 +270,4 @@ function ActorRanking({ connectionStatus, handleStatusClick }) {
     );
 }
 
-export default ActorRanking;
+export default ActorDashboard;
