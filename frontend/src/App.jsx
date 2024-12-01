@@ -10,7 +10,6 @@ import DashBoard from './pages/DashboardPage'
 import MainLayout from './components/MainLayout'
 import ComparePage from './pages/ComparePage';
 import ActorRanking from './pages/ActorDashboard';
-import ActorRanking from './pages/ActorDashboard'
 import './App.css'
 import './styles/index.css'
 
