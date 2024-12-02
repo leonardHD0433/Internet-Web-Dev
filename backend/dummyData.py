@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Path to the CSV file
-csv_file_path = 'backend/Users_Dummy_Data.csv'
+csv_file_path = 'backend/ini/Users_Dummy_Data.csv'
 
 # Read the CSV file into a DataFrame
 users_df = pd.read_csv(csv_file_path)
