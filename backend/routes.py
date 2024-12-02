@@ -735,6 +735,16 @@ def check_watchlist(user_id: int, movie_id: int, db: Session = Depends(get_db)):
     watchlist_entry = db.query(Watchlist).filter_by(user_id=user_id, movie_id=movie_id).first()
     return {"in_watchlist": bool(watchlist_entry)}
 
+@router.delete("/remove-watchlist")
+def remove_from_watchlist(user_id: int, movie_id: int, db: Session = Depends(get_db)):
+    watchlist_entry = db.query(Watchlist).filter_by(user_id=user_id, movie_id=movie_id).first()
+    if not watchlist_entry:
+        raise HTTPException(status_code=400, detail="Movie not in watchlist")
+
+    db.delete(watchlist_entry)
+    db.commit()
+    return {"success": True, "message": "Movie removed from watchlist"}
+
 @router.get("/watchlistStats")
 def get_watchlist_stats(user_id: int, db: Session = Depends(get_db)):
     query = db.query(

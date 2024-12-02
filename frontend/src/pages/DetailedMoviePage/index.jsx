@@ -11,6 +11,7 @@ const DetailedMoviePage = () => {
   const [error, setError] = useState(null);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showRemoveMessage, setShowRemoveMessage] = useState(false); // New state variable
   const userId = JSON.parse(localStorage.getItem('user')).userId;
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const DetailedMoviePage = () => {
 
         // Check if the movie is in the user's watchlist
         const watchlistResponse = await fetch(
-          `${import.meta.env.VITE_API_URL}/check-watchlist?user_id=${userId}&movie_id=${id}`
+          `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_GET_WATCHLIST_PATH}?user_id=${userId}&movie_id=${id}`
         );
         const watchlistData = await watchlistResponse.json();
         setInWatchlist(watchlistData.in_watchlist);
@@ -67,6 +68,30 @@ const DetailedMoviePage = () => {
     }
   };
 
+  const handleRemoveFromWatchlist = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}${import.meta.env.VITE_API_DELETE_WATCHLIST_PATH}?user_id=${userId}&movie_id=${id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to remove movie from watchlist');
+      }
+
+      const data = await response.json();
+      if (data.success) {
+        setInWatchlist(false);
+        setShowRemoveMessage(true);
+        setTimeout(() => setShowRemoveMessage(false), 3000); // Hide remove message after 3 seconds
+      }
+    } catch (err) {
+      console.error('Error removing movie from watchlist:', err);
+    }
+  };
+
   if (loading) {
     return <div className="detail-movie">Loading...</div>;
   }
@@ -101,13 +126,20 @@ const DetailedMoviePage = () => {
             <p><strong>Director:</strong> <TextLooper texts={directorTexts} interval={3000} /></p>
           </div>
           <p className="movie-overview"><strong>Overview:</strong><br/> {movieDetails.overview || 'No overview available.'}</p>
-          {!inWatchlist && (
+          {!inWatchlist ? (
             <div className="watchlist-button">
               <button onClick={handleAddToWatchlist}>Add to Watchlist</button>
+            </div>
+          ) : (
+            <div className="watchlist-button">
+              <button onClick={handleRemoveFromWatchlist}>Remove from Watchlist</button>
             </div>
           )}
           {showSuccessMessage && (
             <div className="success-message">Movie added to watchlist!</div>
+          )}
+          {showRemoveMessage && (
+            <div className="remove-message">Movie removed from watchlist!</div>
           )}
         </div>
       </div>
