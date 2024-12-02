@@ -172,7 +172,7 @@ const DashboardPage = () => {
         </div> 
         <div className="dashboard-more-graph-container">
             <div className="dashboard-more-graph-header">
-                <div className="dashboard-more-usertitle">Number of Users on the Platform</div>
+                <div className="dashboard-more-usertitle">Number of users joining the platform every year</div>
                 <div className="dashboard-more-commontitle">Most Common Movie Genres</div>
             </div>
             <div className="dashboard-more-graph">
